@@ -28,6 +28,7 @@ Route4Me|Maršruta optimizācijas platforma, kas paredzēta uzņēmumiem un priv
 ## Prasības
 ## Algoritms
 ## Konceptu modelis
+![Link Error](https://i.ibb.co/PKQXZQB/image.png)
 ## Tehnoloģiju steks
 
 ## Programmatūras
