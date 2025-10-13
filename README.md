@@ -14,7 +14,16 @@ Maršruta optimizācija ir galvenais mērķis loģistikas un piegādes sistēmā
 ### Mērķis 
 Izstrādāt sistēmu, kas optimizē piegādes maršrutus, ņemot vērā dažādus faktorus, tostarp klienta ģeogrāfisko atrašanās vietu, izvēlēto laika logu un pieejamo kurjeru skaitu, kā arī citu loģistikai svarīgu informāciju.
 ### Uzdevumi 
-pasani nado obsudit!
+#### 1. Analizēt problēmu un izvirzīt mērķi.
+#### 2. Izpētīt esošos līdzīgos risinājumus.
+#### 3. Izstrādāt un īstenot algoritmu
+#### 4. Izveidot datu bāzi.
+#### 5. Izstrādāt servera pusi (REST API)
+#### 6. Izstrādāt klienta pusi (UX/UI).
+#### 7. Vizuāli parādīt maršrutus kartē.
+#### 8. Algoritma testēšana un optimizācija
+#### 9. Veikt pašanalīzi un uzrakstīt secinājumus.
+
 # Līdzīgo risinājumu pārskats
 | Risinājumi   | Apraksts   | Priekšrocības  | Trūkumi |
 |--------------|----------------|--------------------|--------------|
@@ -23,14 +32,36 @@ RouteXL|Bezmaksas tiešsaistes vairāku pieturu maršruta plānotājs, kas optim
 OpenStreetMap|Projekts, lai izveidotu un nodrošinātu bezmaksas un atvērtā koda pasaules karti|Atvērts un bezmaksas resurss, pieejams plašs ģeogrāfisko datu apjoms, lietotāji paši var papildināt un uzlabot kartes|Nav pilnībā standartizētu maršrutēšanas rīku, datu kvalitāte dažās vietās var būt nepilnīga vai neprecīza|
 OptimoRoute|Pakalpojums piegādes un pakalpojumu maršrutu automātiskai plānošanai, optimizācijai un izsekošanai|Profesionāls rīks loģistikas un piegādes uzņēmumiem, atbalsta maršrutu plānošanu ar daudziem transportlīdzekļiem un ierobežojumiem|Sarežģītāka apmācība jaunajiem lietotājiem|
 Route4Me|Maršruta optimizācijas platforma, kas paredzēta uzņēmumiem un privātpersonām|Ērts vairāku pieturas punktu maršrutēšanas rīks, mobilā aplikācija, ātra adrešu optimizācija, piemērots maziem un vidējiem uzņēmumiem|Pilnvērtīgās funkcijas pieejamas tikai maksas versijā, nav tik detalizētas satiksmes informācijas kā Google Maps|
-# Tehnisksis risinājums
+# Tehniskais risinājums
 
 ## Prasības
 ## Algoritms
 ## Konceptu modelis
-![Link Error](https://i.ibb.co/PKQXZQB/image.png)
+![Link Error](https://i.ibb.co/rGXDfm6q/image.png)
+### Klients: 
+Viens Klients var izveidot vairākus Pasūtījumus (1:N).
+### Pasūtījums: 
+Katram Pasūtījumam ir viens Klients (N:1); <br>
+Katrs Pasūtījums tiek piešķirts konkrētam Maršrutam (N:1);<br>
+Katru pasūtījumu apstiprina Administrators (N:1).<br>
+### Administrators:
+Viens Administrators var apstrādāt vairākus Pasūtījumus (1:N);<br>
+Var izveidot un modificēt vairākus Maršrutus (1:N).<br>
+### Kurjeri:
+Katrs Kurjers izmanto vienu Transportu (N:1);<br>
+Katram Kurjeram ir viens vai vairāki Maršruti (1:N).<br>
+### Maršruts:
+Viens Maršruts sastāv no vairākiem Pasūtījuma punktiem (1:N);<br>
+Katrs Maršruts pieder vienam Kurjeram (N:1);<br>
+Katram Maršrutam var būt vairāki Pasūtījumi (1:N).<br>
+### Pasūtījuma punkts:
+Katrs Pasūtījuma punkts pieder konkrētam Maršrutam (N:1);<br>
+Saistīts ar vienu Pasūtījumu (N:1).<br>
+### Transports:
+Katrs Transports var būt piesaistīts vienam vai vairākiem Kurjeriem (1:N, bet parasti 1:1 reālā laikā);<br>
+Katrs Transports tiek izmantots vairākos Maršrutos (1:N).<br>
 ## Tehnoloģiju steks
-
+![Link Error](https://i.ibb.co/F4XFPGVQ/image.png)
 ## Programmatūras
 
 # Novērtējums
