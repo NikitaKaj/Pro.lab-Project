@@ -1,11 +1,8 @@
-
 <template>
-
-  <RouterView />
+  <div class="flex h-screen w-screen">
+    <Sidebar />
+    <main class="flex-1 overflow-y-auto bg-gray-100">
+      <RouterView />
+    </main>
+  </div>
 </template>
-
-<script setup lang="ts">
-</script>
-
-<style>
-</style>
