@@ -36,8 +36,7 @@ const routes = ref([
 </script>
 
 <template>
-  
-  <div class="fixed inset-0 flex bg-white text-gray-900 overflow-hidden">
+  <div class="flex min-h-screen bg-white text-gray-900">
     <Sidebar />
 
     <div class="flex-1 px-12 py-12">
@@ -55,7 +54,7 @@ const routes = ref([
         </div>
 
         <!-- Лист курьеров -->
-        <div class="w-1/3 bg-white rounded-lg border border-gray-200 shadow-sm shadow-sm p-4">
+        <div class="w-1/3 bg-white rounded-lg border border-gray-200 shadow-sm p-4">
           <h2 class="text-lg text-black font-semibold mb-4">Pienemšanas laiks</h2>
           <ul class="space-y-3">
             <li v-for="(r, i) in routes" :key="i" class="border-b pb-2">
