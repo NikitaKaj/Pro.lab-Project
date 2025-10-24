@@ -12,9 +12,9 @@ function onGenerateRoute() {
 </script>
 
 <template>
-  <div class="fixed inset-0 flex bg-white text-gray-900 overflow-hidden">
+  <div class="flex min-h-screen bg-white text-gray-900">
     <Sidebar />
-
+    
     <main class="flex-1 overflow-auto">
       <div class="w-full px-12 py-12">
         <PageHeader title="Dashboard" @action="onGenerateRoute" />
