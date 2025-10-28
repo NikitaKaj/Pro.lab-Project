@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import Sidebar from '@/components/SideBar.vue'
+import MapView from "@/components/MapView.vue";
 
 // Пример данных, надо будет подключить API
 const routes = ref([
@@ -50,7 +51,7 @@ const routes = ref([
       <div class="flex gap-6 pt-10">
         <!-- Карта -->
         <div class="w-2/3 bg-white rounded-lg border border-gray-200 shadow-sm h-[600px] flex items-center justify-center">
-          <span class="text-black">[Map Placeholder]</span>
+            <MapView />
         </div>
 
         <!-- Лист курьеров -->
