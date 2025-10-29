@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import Sidebar from '@/components/SideBar.vue'
+import MapView from "@/components/MapView.vue";
+import PageHeader from '@/components/PageHeader.vue';
 
 // Пример данных, надо будет подключить API
 const routes = ref([
@@ -40,17 +42,12 @@ const routes = ref([
     <Sidebar />
 
     <div class="flex-1 px-12 py-12">
-      <div class="flex justify-between items-center mb-6">
-        <h1 class="text-4xl font-extrabold">Routes</h1>
-        <button class="bg-[#1673ea] hover:bg-[#105fc6] text-white font-semibold px-7 py-3.5 rounded-md shadow" @click="$emit('action')">
-          Generate Optimal Route
-        </button>
-      </div>
+      <PageHeader title="Routes" />
 
-      <div class="flex gap-6 pt-10">
+      <div class="flex gap-6">
         <!-- Карта -->
         <div class="w-2/3 bg-white rounded-lg border border-gray-200 shadow-sm h-[600px] flex items-center justify-center">
-          <span class="text-black">[Map Placeholder]</span>
+            <MapView />
         </div>
 
         <!-- Лист курьеров -->
