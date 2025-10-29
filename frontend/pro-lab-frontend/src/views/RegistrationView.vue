@@ -2,12 +2,12 @@
   <div class="flex h-screen">
     <!-- Левая часть -->
     <div class="w-1/2 bg-gray-50 flex flex-col items-center justify-center">
-      <div class="max-w-sm text-center">
-        <!-- <img
-          src="/delivery-illustration.png"
+      <div class="text-center">
+        <img
+          src="@/assets/images/RegistrationImage.jpg"
           alt="Delivery Illustration"
-          class="w-full"
-        /> -->
+          class="w-full h-full"
+        />
       </div>
     </div>
 
