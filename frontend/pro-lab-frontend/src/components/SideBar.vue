@@ -8,12 +8,12 @@
       </div>
     </div>
     <nav class="space-y-2 text-[15px]">
-      <RouterLink to="/" class="router-link">
+      <RouterLink to="/dashboard" class="router-link">
         <span>🏠</span>
         <span>Dashboard</span>
       </RouterLink>
 
-      <RouterLink to="/" class="router-link">
+      <RouterLink to="/dashboard" class="router-link">
         <span>🧾</span>
         <span>Orders</span>
       </RouterLink>
@@ -23,18 +23,25 @@
         <span>Routes</span>
       </RouterLink>
 
-      <RouterLink to="/" class="router-link">
+      <RouterLink to="/dashboard" class="router-link">
         <span>👤</span>
         <span>Couriers</span>
       </RouterLink>
 
-      <RouterLink to="/" class="router-link">
+      <RouterLink to="/dashboard" class="router-link">
         <span>👥</span>
         <span>Clients</span>
+      </RouterLink>
+
+      <RouterLink to="/" class="router-link">
+        <span>🚪</span>
+        <span>Logout</span>
       </RouterLink>
     </nav>
   </aside>
 </template>
 
 <script setup lang="ts">
+import { RouterLink } from 'vue-router';
+
 </script>
