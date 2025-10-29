@@ -9,32 +9,32 @@
     </div>
     <nav class="space-y-2 text-[15px]">
       <RouterLink to="/dashboard" class="router-link">
-        <span>🏠</span>
+        <HomeIcon class="w-5 h-5" />
         <span>Dashboard</span>
       </RouterLink>
 
       <RouterLink to="/dashboard" class="router-link">
-        <span>🧾</span>
+        <ShoppingCartIcon class="w-5 h-5" />
         <span>Orders</span>
       </RouterLink>
 
       <RouterLink to="/routes" class="router-link">
-        <span>🧭</span>
+        <MapIcon class="w-5 h-5" />
         <span>Routes</span>
       </RouterLink>
 
       <RouterLink to="/dashboard" class="router-link">
-        <span>👤</span>
+        <TruckIcon class="w-5 h-5" />
         <span>Couriers</span>
       </RouterLink>
 
       <RouterLink to="/dashboard" class="router-link">
-        <span>👥</span>
+        <UserIcon class="w-5 h-5" />
         <span>Clients</span>
       </RouterLink>
 
       <RouterLink to="/" class="router-link">
-        <span>🚪</span>
+        <ArrowRightOnRectangleIcon class="w-5 h-5" />
         <span>Logout</span>
       </RouterLink>
     </nav>
@@ -43,5 +43,6 @@
 
 <script setup lang="ts">
 import { RouterLink } from 'vue-router';
+import { HomeIcon, UserIcon, ArrowRightOnRectangleIcon, ShoppingCartIcon, TruckIcon, MapIcon } from '@heroicons/vue/24/outline';
 
 </script>
