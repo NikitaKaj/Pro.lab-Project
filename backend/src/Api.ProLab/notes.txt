@@ -1,0 +1,21 @@
+CMD:
+
+doskey add-migration=dotnet ef migrations add $* --project ../Data.ProLab --verbose
+doskey remove-migration=dotnet ef migrations remove --project ../Data.ProLab --verbose
+doskey update-db=dotnet ef database update $* --project ../Data.ProLab --verbose
+
+add-migration MigrationName
+
+PowerShell:
+
+function add-migration {
+    dotnet ef migrations add $args --project ../Data.ProLab
+}
+
+add-migration MigrationName
+
+Bash:
+
+alias add-migration='dotnet ef migrations add $* --project ../Data.ProLab'
+
+add-migration MigrationName
