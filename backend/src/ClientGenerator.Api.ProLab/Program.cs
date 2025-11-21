@@ -36,12 +36,10 @@ namespace ClientGenerator.Api.ProLab
             {
               var settings = new TypeScriptClientGeneratorSettings();
 
-              //settings.TypeScriptGeneratorSettings.
               settings.Template = TypeScriptTemplate.Axios;
-              //settings.UseGetBaseUrlMethod = false;
               settings.TypeScriptGeneratorSettings.NullValue = TypeScriptNullValue.Null;
               settings.TypeScriptGeneratorSettings.MarkOptionalProperties = false;
-              // wonder  why it was here
+              settings.UseTransformOptionsMethod = true;
               settings.UseTransformResultMethod = true;
               settings.ClientBaseClass = "ClientsBase";
 
@@ -52,6 +50,9 @@ namespace ClientGenerator.Api.ProLab
               settings.TypeScriptGeneratorSettings.TypeStyle = TypeScriptTypeStyle.Interface;
               settings.TypeScriptGeneratorSettings.TypeScriptVersion = 5M;
               settings.TypeScriptGeneratorSettings.DateTimeType = TypeScriptDateTimeType.Date;
+              settings.TypeScriptGeneratorSettings.TemplateDirectory = Path.Combine(
+                    Directory.GetCurrentDirectory(), "nswag-templates"
+                );
 
               var generator = new TypeScriptClientGenerator(document, settings);
               var code = generator.GenerateFile();

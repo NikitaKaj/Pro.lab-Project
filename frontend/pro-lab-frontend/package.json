@@ -11,10 +11,12 @@
     "build": "run-p type-check \"build-only {@}\" --",
     "preview": "vite preview",
     "build-only": "vite build",
-    "type-check": "vue-tsc --build"
+    "type-check": "vue-tsc --build",
+    "generate": "dotnet run --project ../../backend/src/ClientGenerator.Api.ProLab https://localhost:5001/swagger/v1/swagger.json ./src/api-client/clients.ts TypeScript"
   },
   "dependencies": {
     "@heroicons/vue": "^2.2.0",
+    "axios": "^1.13.2",
     "chart.js": "^4.5.1",
     "mapbox-gl": "^3.16.0",
     "pinia": "^3.0.3",
