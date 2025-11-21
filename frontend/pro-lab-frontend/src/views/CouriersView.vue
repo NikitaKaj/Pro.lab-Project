@@ -113,7 +113,7 @@ function saveEditedOrder() {
         <Sidebar />
 
         <div class="flex-1 px-12 py-12">
-            <PageHeader title="Orders" />
+            <PageHeader title="Couriers" />
 
             <!-- Button add-->
             <div class="mt-6 flex justify-end pr-[80px] pb-[10px]">
