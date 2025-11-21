@@ -17,7 +17,7 @@
         <h2 class="text-2xl font-bold text-center !mb-4 text-gray-800">
           Login
         </h2>
-        <form @submit.prevent="login">
+        <form @submit.prevent="handleLogin">
           <div class="!mb-4">
             <label class="block text-gray-600 !mb-2" for="username">
               User Name
@@ -47,8 +47,9 @@
           <button
             type="submit"
             class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition !mt-4"
+            :disabled="loading"
           >
-            Login
+             {{ loading ? 'Processing...' : 'Login' }}
           </button>
         </form>
       </div>
@@ -58,11 +59,40 @@
 
 <script setup>
 import { ref } from "vue";
+import { AccountsClient } from '@/api-client/clients';
+import { useRouter } from 'vue-router'
+
+// const apiUrl = import.meta.env.VITE_API_URL ?? 'https://localhost:5001';
+const accountsClient = new AccountsClient();
+const router = useRouter()
 
 const username = ref("");
 const password = ref("");
+const loading = ref(false)
+const error = ref("")
 
-function login() {
-  alert(`Username: ${username.value}\nPassword: ${password.value}`);
+const handleLogin = async () => {
+  error.value = ''
+  loading.value = true
+
+  try {
+    const res = await accountsClient.login({
+      email: username.value,
+      password: password.value,
+    })
+
+    console.log(res.accessToken)
+    console.log(res.refreshToken)
+    localStorage.setItem('accessToken', res.accessToken ?? '')
+    localStorage.setItem('refreshToken', res.refreshToken ?? '')
+    router.push('/dashboard')
+
+  } catch (e) {
+    console.error(e)
+    error.value = 'Incorrect login or password'
+    alert(error.value);
+  } finally {
+    loading.value = false
+  }
 }
 </script>

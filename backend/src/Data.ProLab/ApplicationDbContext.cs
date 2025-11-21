@@ -6,6 +6,10 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using ProLab.Data.Entities.Orders;
+using ProLab.Data.Entities.Clients;
+using ProLab.Data.Entities.Couriers;
+using ProLab.Data.Entities.Routes;
 
 namespace ProLab.Data;
 
@@ -17,6 +21,10 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<long>, 
 	}
 
 	public DbSet<LogEntry> LogEntries => Set<LogEntry>();
+		public DbSet<Order> Orders { get; set; }
+        public DbSet<Client> Clients { get; set; }
+        public DbSet<Courier> Couriers { get; set; }
+        public DbSet<Route> Routes { get; set; }
 
 	protected override void OnModelCreating(ModelBuilder builder)
 	{
@@ -26,8 +34,28 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<long>, 
 
 		SetCreatedAtDefaults(builder);
 		MapUserTableNames(builder);
-		//SetUtcDateTimeConverter(builder);
 
+		builder.Entity<Order>(e =>
+		{
+			e.HasKey(x => x.Id);
+
+			e.HasOne<Client>()
+				.WithMany()
+				.HasForeignKey(o => o.ClientId)
+				.OnDelete(DeleteBehavior.Restrict);
+
+			e.HasOne<Courier>()
+				.WithMany()
+				.HasForeignKey(o => o.CourierId)
+				.OnDelete(DeleteBehavior.Restrict);
+
+			e.HasOne<Route>()
+				.WithMany()
+				.HasForeignKey(o => o.RouteId)
+				.OnDelete(DeleteBehavior.SetNull);
+		});
+
+		//SetUtcDateTimeConverter(builder);
 	}
 
 	private static void MapUserTableNames(ModelBuilder builder)

@@ -33,10 +33,14 @@
         <span>Clients</span>
       </RouterLink>
 
-      <RouterLink to="/" class="router-link">
+      <button
+        type="button"
+        @click="handleLogout"
+        class="flex items-center gap-3 px-4 py-2 rounded-lg w-full hover:bg-white/10 transition-colors cursor-pointer"
+      >
         <ArrowRightOnRectangleIcon class="w-5 h-5" />
         <span>Logout</span>
-      </RouterLink>
+      </button>
     </nav>
   </aside>
 </template>
@@ -44,5 +48,23 @@
 <script setup lang="ts">
 import { RouterLink } from 'vue-router';
 import { HomeIcon, UserIcon, ArrowRightOnRectangleIcon, ShoppingCartIcon, TruckIcon, MapIcon } from '@heroicons/vue/24/outline';
+import { AccountsClient } from '@/api-client/clients';
+import { useRouter } from 'vue-router'
 
+const accountsClient = new AccountsClient();
+const router = useRouter();
+
+const handleLogout = async () => {
+  try {
+    await accountsClient.logout();
+
+    localStorage.removeItem('accessToken')
+    localStorage.removeItem('refreshToken')
+    router.push('/')
+
+  } catch (e) {
+    alert("You're not authorized");
+    console.error(e)
+  }
+}
 </script>

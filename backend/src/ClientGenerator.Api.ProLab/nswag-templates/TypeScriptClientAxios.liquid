@@ -1,0 +1,67 @@
+{% assign useTransformResultMethod = UseTransformResultMethod %}
+{% assign useTransformOptionsMethod = UseTransformOptionsMethod %}
+{% assign clientBaseClass = ClientBaseClass %}
+{% assign suffix = "" %}
+
+/* eslint-disable */
+// ReSharper disable InconsistentNaming
+
+import axios, { AxiosError } from 'axios';
+import type { AxiosInstance, AxiosRequestConfig, AxiosResponse, CancelToken } from 'axios';
+import {{ clientBaseClass }} from './ClientBase';
+
+{%- for operation in Operations -%}
+
+export class {{ operation.ClassName }} extends {{ clientBaseClass }} {
+    protected instance: AxiosInstance;
+    protected baseUrl: string;
+
+    constructor(baseUrl?: string, instance?: AxiosInstance) {
+        super();
+        this.instance = instance || axios.create();
+        this.baseUrl = baseUrl ?? "{{ BaseUrl }}";
+    }
+
+    {%- for method in operation.Methods -%}
+
+    {{ method.Name }}({% for parameter in method.Parameters %}{{ parameter.Name | escape }}{{parameter.TypeSuffix }}{% if not forloop.last %}, {% endif %}{% endfor %}): Promise<{{ method.ResultType }}> {
+
+        let url_ = this.baseUrl + "{{ method.Path }}";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "{{ method.HttpMethod }}",
+            url: url_,
+            headers: {
+                {% if method.HasRequestBody %}"Content-Type": "application/json",{% endif %}
+                "Accept": "application/json"
+            },
+            {% if method.HasRequestBody %}data: JSON.stringify({{ method.BodyParameterName }}),{% endif %}
+        };
+
+        return this.transformOptions(options_)
+            .then(opts => this.instance.request(opts))
+            .then((_response: AxiosResponse) =>
+                this.transformResult(url_, _response, async (_response) => {
+                    return this.process{{ method.Name }}(_response);
+                })
+            );
+    }
+
+    protected async process{{ method.Name }}(response: AxiosResponse): Promise<any> {
+        const status = response.status;
+
+        if (status === 200) {
+            let raw = response.data;
+
+            if (typeof raw !== "string") {
+                raw = JSON.stringify(raw);
+            }
+
+            return JSON.parse(raw);
+        }
+        return null;
+    }
+    {% endfor -%}
+}
+{% endfor %}
