@@ -13,7 +13,7 @@
         <span>Dashboard</span>
       </RouterLink>
 
-      <RouterLink to="/dashboard" class="router-link">
+      <RouterLink to="/orders" class="router-link">
         <ShoppingCartIcon class="w-5 h-5" />
         <span>Orders</span>
       </RouterLink>
@@ -23,15 +23,15 @@
         <span>Routes</span>
       </RouterLink>
 
-      <RouterLink to="/dashboard" class="router-link">
+      <RouterLink to="/couriers" class="router-link">
         <TruckIcon class="w-5 h-5" />
         <span>Couriers</span>
       </RouterLink>
 
-      <RouterLink to="/dashboard" class="router-link">
+      <!-- <RouterLink to="/dashboard" class="router-link">
         <UserIcon class="w-5 h-5" />
         <span>Clients</span>
-      </RouterLink>
+      </RouterLink> -->
 
       <button
         type="button"
