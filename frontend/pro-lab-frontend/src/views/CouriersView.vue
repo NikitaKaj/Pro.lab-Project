@@ -29,12 +29,10 @@ function prevPage() {
     if (currentPage.value > 1) currentPage.value--
 }
 
-// Delete
 function deleteOrder(id: string) {
     items.value = items.value.filter(o => o.id !== id)
 }
 
-// Modal
 const showModal = ref(false)
 const showEditModal = ref(false)
 const editIndex = ref<number | null>(null)
@@ -46,12 +44,10 @@ const newOrder = ref({
     shipped: 0,
 })
 
-// Id generation
 function generateId() {
     return "#" + Math.floor(10000 + Math.random() * 90000)
 }
 
-// Add order
 function addOrder() {
     if (!newOrder.value.courier) return
 
@@ -72,7 +68,6 @@ function addOrder() {
     }
 }
 
-// Open Edit
 function openEditModal(order: any, index: number) {
     editIndex.value = index
     newOrder.value = {
@@ -84,7 +79,6 @@ function openEditModal(order: any, index: number) {
     showEditModal.value = true
 }
 
-// Save Edit
 function saveEditedOrder() {
     if (editIndex.value !== null) {
         items.value[editIndex.value] = {
@@ -114,8 +108,7 @@ function saveEditedOrder() {
 
         <div class="flex-1 px-12 py-12">
             <PageHeader title="Couriers" />
-
-            <!-- Button add-->
+>
             <div class="mt-6 flex justify-end pr-[80px] pb-[10px]">
                 <button @click="showModal = true" class="border border-[#1673ea] text-[#1673ea] font-semibold px-7 py-3.5 
                  rounded-md shadow bg-white hover:bg-[#1673ea] hover:text-white transition">
@@ -123,7 +116,6 @@ function saveEditedOrder() {
                 </button>
             </div>
 
-            <!-- Table -->
             <div class="flex justify-center">
                 <table class="table-fixed border-2 w-[90%] bg-white">
                     <thead class="border-2 font-bold">
@@ -155,7 +147,6 @@ function saveEditedOrder() {
                 </table>
             </div>
 
-            <!-- Bot. but. -->
             <div class="flex justify-end pr-[80px] pt-[14px] items-center">
                 <span style="margin-right: 14px;">
                     {{ (currentPage - 1) * perPage + 1 }} -
@@ -175,7 +166,6 @@ function saveEditedOrder() {
             </div>
         </div>
 
-        <!--  Modal Add -->
         <div v-if="showModal" class="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center">
             <div class="bg-white p-6 rounded-lg shadow-lg w-[400px]">
                 <h2 class="text-xl font-bold mb-4 text-center">Add Courier</h2>
@@ -196,7 +186,6 @@ function saveEditedOrder() {
             </div>
         </div>
 
-        <!--  Modal Edit -->
         <div v-if="showEditModal" class="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center">
             <div class="bg-white p-6 rounded-lg shadow-lg w-[400px]">
                 <h2 class="text-xl font-bold mb-4 text-center">Edit Courier</h2>

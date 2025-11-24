@@ -112,7 +112,6 @@ function saveEditedOrder() {
     <div class="flex-1 px-12 py-12">
       <PageHeader title="Orders" />
 
-      <!-- Button add-->
       <div class="mt-6 flex justify-end pr-[80px] pb-[10px]">
         <button @click="openAddModal" class="border border-[#1673ea] text-[#1673ea] font-semibold px-7 py-3.5 
                  rounded-md shadow bg-white hover:bg-[#1673ea] hover:text-white transition">
@@ -120,7 +119,6 @@ function saveEditedOrder() {
         </button>
       </div>
 
-      <!-- Table -->
       <div class="flex justify-center">
         <table class="table-fixed border-2 w-[90%] bg-white">
           <thead class="border-2 font-bold">
@@ -172,7 +170,6 @@ function saveEditedOrder() {
       </div>
     </div>
 
-    <!--  Modal for adding -->
     <div v-if="showAddModal" class="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center">
       <div class="bg-white p-6 rounded-lg shadow-lg w-[400px]">
         <h2 class="text-xl font-bold mb-4 text-center">Add New Order</h2>
@@ -194,7 +191,6 @@ function saveEditedOrder() {
       </div>
     </div>
 
-    <!--  Modal for editing -->
     <div v-if="showEditModal" class="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center">
       <div class="bg-white p-6 rounded-lg shadow-lg w-[400px]">
         <h2 class="text-xl font-bold mb-4 text-center">Edit Order</h2>
