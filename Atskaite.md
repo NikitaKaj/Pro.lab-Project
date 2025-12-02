@@ -66,6 +66,46 @@ Katrs Transports tiek izmantots vairākos Maršrutos (1:N).<br>
 
 # Novērtējums
 ## Novērtēšanas plāns
+## Novērtējums
+
+### Novērtēšanas plāns
+
+#### Eksperimenta mērķis
+
+Novērtēt maršrutu plānošanas algoritma veiktspēju, mainot pieejamo kurjeru skaitu, kurjeru maiņas garumu un vidējo apkalpošanas laiku pie klienta, lai pēc iespējas efektīvāk sadalītu piegādes kurjeru starpā.
+
+#### Ieejas parametri
+
+- **Kurjeru skaits (K)** – kopējais pieejamo kurjeru skaits vienas maiņas laikā.
+- **Kurjera maiņas ilgums (MI, h)** – maksimālais darba laiks vienam kurjeram maiņā.
+- **Vidējais pieturas laiks pie klienta (VPT, min)** – vidējais laiks, kas nepieciešams viena klienta apkalpošanai (izkāpšana, nodošana, paraksts u.tml.).
+
+#### Novērtēšanas mēri
+
+- **Maršrutu plānošanas laiks (W, s)** – algoritma izpildes laiks, lai izveidotu maršrutus visiem kurjeriem.
+- **Vidējais kurjeru noslogojums (U, %)** – kurjeru faktiskā darba laika attiecība pret pieejamo maiņas laiku (cik efektīvi tiek izmantoti kurjeri).
+
+#### Eksperimentu plāns
+
+| Nr. | K  | MI (h) | VPT (min) | W (s) | U (%) |
+|----:|---:|-------:|----------:|:-----:|:-----:|
+| 1   | 2  | 6      | 5         |       |       |
+| 2   | 4  | 6      | 5         |       |       |
+| 3   | 6  | 6      | 5         |       |       |
+| 4   | 8  | 6      | 5         |       |       |
+| 5   | 2  | 6      | 10        |       |       |
+| 6   | 4  | 6      | 10        |       |       |
+| 7   | 6  | 6      | 10        |       |       |
+| 8   | 8  | 6      | 10        |       |       |
+| 9   | 2  | 8      | 5         |       |       |
+| 10  | 4  | 8      | 5         |       |       |
+| 11  | 6  | 8      | 5         |       |       |
+| 12  | 8  | 8      | 5         |       |       |
+| 13  | 2  | 8      | 10        |       |       |
+| 14  | 4  | 8      | 10        |       |       |
+| 15  | 6  | 8      | 10        |       |       |
+| 16  | 8  | 8      | 10        |       |       |
+
 ## Novērtēšanas rezultāti
 
 # Secinājumi
