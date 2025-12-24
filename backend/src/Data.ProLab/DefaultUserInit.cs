@@ -15,18 +15,15 @@ namespace ProLab.Data
 		public void Configure(EntityTypeBuilder<User> builder)
 		{
 			var hasher = new PasswordHasher<User>();
-			var user = new User("admin@prolab.zov");
+			var user = new User("admin");
 			user.Id = 1;
 			user.EmailConfirmed = true;
 			user.PhoneNumberConfirmed = true;
 			user.SecurityStamp = Guid.NewGuid().ToString();
-			user.Country = "Ukraine";
-			user.City = "Kiev";
-			user.Address = "Zelensky street 10";
-			user.ZipCode = "1010";
-			user.FirstName = "Nikita";
-			user.LastName = "Kajurins";
-			user.PasswordHash = hasher.HashPassword(user, "1234");
+			user.Country = "Latvia";
+			user.FirstName = "Admin";
+			user.LastName = "Adminovs";
+			user.PasswordHash = hasher.HashPassword(user, "admin");
 			builder.HasData(user);
 		}
 	}

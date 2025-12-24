@@ -300,7 +300,7 @@ namespace ProLab.Data.Migrations
             migrationBuilder.InsertData(
                 table: "Users",
                 columns: new[] { "Id", "AccessFailedCount", "Address", "AgreedToPrivacyPolicy", "City", "ConcurrencyStamp", "Country", "Email", "EmailConfirmed", "FirstName", "LastName", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "TwoFactorEnabled", "UpdatedAt", "UserName", "ZipCode" },
-                values: new object[] { 1L, 0, "Zelensky street 10", false, "Kiev", "28aa9de0-9691-4bb9-9eb6-2d7e8ce35f54", "Ukraine", "admin@prolab.zov", true, "Nikita", "Kajurins", false, null, "ADMIN@PROLAB.ZOV", "ADMIN@PROLAB.ZOV", "AQAAAAIAAYagAAAAELPXmJTv8MudGqT2nPZJu4WImvX7pH3nIMZGyPHp34fjFjYOV3VIqZf5rME5Uzk1Aw==", null, true, "3f89a89d-7fd8-4d05-b1ea-6c0b29326117", false, null, "admin@prolab.zov", "1010" });
+                values: new object[] { 1L, 0, null, false, null, "945bfd2a-ba75-4db0-a377-d12a5d363b65", "Latvia", "admin", true, "Admin", "Adminovs", false, null, "ADMIN", "ADMIN", "AQAAAAIAAYagAAAAED+e3pQmDNoPQzBbGEbE0YMlQhQQC04ZZwu9+t7BXNjTy4mJKtxPSAPmlaqWN7w/lg==", null, true, "04093d03-cafb-401b-929b-28cbe8fac675", false, null, "admin", null });
 
             migrationBuilder.InsertData(
                 table: "UserClaims",

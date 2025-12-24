@@ -100,15 +100,11 @@ function saveEditedOrder() {
 }
 </script>
 
-
-
 <template>
     <div class="flex min-h-screen bg-white text-gray-900">
         <Sidebar />
-
         <div class="flex-1 px-12 py-12">
             <PageHeader title="Couriers" />
->
             <div class="mt-6 flex justify-end pr-[80px] pb-[10px]">
                 <button @click="showModal = true" class="border border-[#1673ea] text-[#1673ea] font-semibold px-7 py-3.5 
                  rounded-md shadow bg-white hover:bg-[#1673ea] hover:text-white transition">
