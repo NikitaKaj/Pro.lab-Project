@@ -27,7 +27,7 @@
               v-model="username"
               type="text"
               placeholder="Enter your username"
-              class="w-full border border-gray-400 rounded px-3 py-2 placeholder-gray-400"
+              class="w-full border border-gray-400 rounded px-3 py-2 placeholder-gray-400 text-black"
             />
           </div>
 
@@ -40,7 +40,7 @@
               v-model="password"
               type="password"
               placeholder="Enter your password"
-              class="w-full border border-gray-400 rounded px-3 py-2 placeholder-gray-400"
+              class="w-full border border-gray-400 rounded px-3 py-2 placeholder-gray-400 text-black"
             />
           </div>
 
@@ -62,7 +62,6 @@ import { ref } from "vue";
 import { AccountsClient } from '@/api-client/clients';
 import { useRouter } from 'vue-router'
 
-// const apiUrl = import.meta.env.VITE_API_URL ?? 'https://localhost:5001';
 const accountsClient = new AccountsClient();
 const router = useRouter()
 

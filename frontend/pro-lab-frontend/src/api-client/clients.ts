@@ -11,6 +11,83 @@ import axios, { AxiosError } from 'axios';
 import type { AxiosInstance, AxiosRequestConfig, AxiosResponse, CancelToken } from 'axios';
 import ClientsBase from './ClientBase';
 
+export class RoutesClient extends ClientsBase {
+    protected instance: AxiosInstance;
+    protected baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(baseUrl?: string, instance?: AxiosInstance) {
+
+        super();
+
+        this.instance = instance || axios.create();
+
+        this.baseUrl = baseUrl ?? "https://localhost:5001";
+
+    }
+
+    login(request: OptimizeRouteRequest, cancelToken?: CancelToken): Promise<OptimizeRouteResponse> {
+        let url_ = this.baseUrl + "/api/routes/optimize";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(request);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.transformOptions(options_).then(transformedOptions_ => {
+            return this.instance.request(transformedOptions_);
+        }).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.transformResult(url_, _response, (_response: AxiosResponse) => this.processLogin(_response));
+        });
+    }
+
+    protected processLogin(response: AxiosResponse): Promise<OptimizeRouteResponse> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<OptimizeRouteResponse>(result200);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<OptimizeRouteResponse>(null as any);
+    }
+}
+
 export class DashboardClient extends ClientsBase {
     protected instance: AxiosInstance;
     protected baseUrl: string;
@@ -372,6 +449,58 @@ export class AccountsClient extends ClientsBase {
     }
 }
 
+export interface OptimizeRouteResponse {
+    visitOrder: number[];
+    totalDistance: number;
+    totalDuration: number;
+    fullGeometry: CoordinateDto[];
+    segments: RouteSegmentDto[] | null;
+}
+
+export interface CoordinateDto {
+    longitude: number;
+    latitude: number;
+}
+
+export interface RouteSegmentDto {
+    fromIndex: number;
+    toIndex: number;
+    distance: number;
+    duration: number;
+    summary: string;
+}
+
+export interface ProblemDetails {
+    type: string | null;
+    title: string | null;
+    status: number | null;
+    detail: string | null;
+    instance: string | null;
+    extensions: { [key: string]: any; };
+
+    [key: string]: any;
+}
+
+export interface OptimizeRouteRequest {
+    coordinates: CoordinateDto[];
+    startIndex: number;
+    algorithm: OptimizationAlgorithm;
+    selectionStrategy: SelectionStrategy | null;
+}
+
+export enum OptimizationAlgorithm {
+    NearestNeighbor = 0,
+    WithAlternatives = 1,
+}
+
+export enum SelectionStrategy {
+    Fastest = 0,
+    Shortest = 1,
+    Balanced = 2,
+    LightestWeight = 3,
+    TimeOfDay = 4,
+}
+
 export interface DashboardResponse {
     completedOrdersCount: number;
     inProgresOrdersCount: number;
@@ -386,17 +515,6 @@ export interface GetProfileInfoResponse {
     city: string | null;
     zipCode: string | null;
     address: string | null;
-}
-
-export interface ProblemDetails {
-    type: string | null;
-    title: string | null;
-    status: number | null;
-    detail: string | null;
-    instance: string | null;
-    extensions: { [key: string]: any; };
-
-    [key: string]: any;
 }
 
 export interface HttpValidationProblemDetails extends ProblemDetails {
