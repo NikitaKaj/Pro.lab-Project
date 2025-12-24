@@ -20,6 +20,7 @@ namespace ProLab.Data
 			user.EmailConfirmed = true;
 			user.PhoneNumberConfirmed = true;
 			user.SecurityStamp = Guid.NewGuid().ToString();
+			user.Country = "Latvia";
 			user.FirstName = "Admin";
 			user.LastName = "Adminovs";
 			user.PasswordHash = hasher.HashPassword(user, "admin");

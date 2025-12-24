@@ -12,7 +12,7 @@ using ProLab.Data;
 namespace ProLab.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251121175714_InitialCreate")]
+    [Migration("20251224153141_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -447,25 +447,22 @@ namespace ProLab.Data.Migrations
                         {
                             Id = 1L,
                             AccessFailedCount = 0,
-                            Address = "Zelensky street 10",
                             AgreedToPrivacyPolicy = false,
-                            City = "Kiev",
-                            ConcurrencyStamp = "28aa9de0-9691-4bb9-9eb6-2d7e8ce35f54",
-                            Country = "Ukraine",
+                            ConcurrencyStamp = "945bfd2a-ba75-4db0-a377-d12a5d363b65",
+                            Country = "Latvia",
                             CreatedAt = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
-                            Email = "admin@prolab.zov",
+                            Email = "admin",
                             EmailConfirmed = true,
-                            FirstName = "Nikita",
-                            LastName = "Kajurins",
+                            FirstName = "Admin",
+                            LastName = "Adminovs",
                             LockoutEnabled = false,
-                            NormalizedEmail = "ADMIN@PROLAB.ZOV",
-                            NormalizedUserName = "ADMIN@PROLAB.ZOV",
-                            PasswordHash = "AQAAAAIAAYagAAAAELPXmJTv8MudGqT2nPZJu4WImvX7pH3nIMZGyPHp34fjFjYOV3VIqZf5rME5Uzk1Aw==",
+                            NormalizedEmail = "ADMIN",
+                            NormalizedUserName = "ADMIN",
+                            PasswordHash = "AQAAAAIAAYagAAAAED+e3pQmDNoPQzBbGEbE0YMlQhQQC04ZZwu9+t7BXNjTy4mJKtxPSAPmlaqWN7w/lg==",
                             PhoneNumberConfirmed = true,
-                            SecurityStamp = "3f89a89d-7fd8-4d05-b1ea-6c0b29326117",
+                            SecurityStamp = "04093d03-cafb-401b-929b-28cbe8fac675",
                             TwoFactorEnabled = false,
-                            UserName = "admin@prolab.zov",
-                            ZipCode = "1010"
+                            UserName = "admin"
                         });
                 });
 
