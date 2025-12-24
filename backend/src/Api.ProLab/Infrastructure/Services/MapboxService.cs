@@ -3,6 +3,7 @@ using Microsoft.Extensions.Options;
 using ProLab.Data.Entities.Routes;
 using ProLab.Api.Infrastructure.Configurations;
 using System.Text.Json;
+using System.Globalization;
 
 namespace ProLab.Api.Infrastructure.Services
 {
@@ -26,12 +27,12 @@ namespace ProLab.Api.Infrastructure.Services
             List<Coordinate> coordinates,
             CancellationToken cancellationToken = default)
         {
-            var cacheKey = $"matrix_{string.Join("_", coordinates.Select(c => c.ToString()))}";
+            var cacheKey = $"matrix_{string.Join("_", coordinates.Select(FormatCoord))}";
 
             if (_cache.TryGetValue<double[,]>(cacheKey, out var cachedMatrix))
                 return cachedMatrix!;
 
-            var coordinatesString = string.Join(";", coordinates.Select(c => c.ToString()));
+            var coordinatesString = string.Join(";", coordinates.Select(FormatCoord));
             var url = $"{_options.BaseUrl}/directions-matrix/v1/mapbox/driving/{coordinatesString}";
 
             var query = $"?access_token={_options.AccessToken}&annotations=duration,distance";
@@ -71,7 +72,7 @@ namespace ProLab.Api.Infrastructure.Services
             if (_cache.TryGetValue<List<AlternativeRoute>>(cacheKey, out var cached))
                 return cached!;
 
-            var url = $"{_options.BaseUrl}/directions/v5/mapbox/driving/{from};{to}";
+            var url = $"{_options.BaseUrl}/directions/v5/mapbox/driving/{FormatCoord(from)};{FormatCoord(to)}";
             var query = $"?access_token={_options.AccessToken}&alternatives=true&geometries=geojson&overview=full";
             var fullUrl = $"{url}{query}";
 
@@ -107,7 +108,7 @@ namespace ProLab.Api.Infrastructure.Services
             List<Coordinate> orderedCoordinates,
             CancellationToken cancellationToken = default)
         {
-            var coordinatesString = string.Join(";", orderedCoordinates.Select(c => c.ToString()));
+            var coordinatesString = string.Join(";", orderedCoordinates.Select(FormatCoord));
             var url = $"{_options.BaseUrl}/directions/v5/mapbox/driving/{coordinatesString}";
             var query = $"?access_token={_options.AccessToken}&geometries=geojson&overview=full&steps=true";
             var fullUrl = $"{url}{query}";
@@ -143,5 +144,8 @@ namespace ProLab.Api.Infrastructure.Services
 
             return coordinates;
         }
+
+        private static string FormatCoord(Coordinate c) =>
+            $"{c.Longitude.ToString(CultureInfo.InvariantCulture)},{c.Latitude.ToString(CultureInfo.InvariantCulture)}";
     }
 }
