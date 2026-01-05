@@ -150,7 +150,6 @@ function saveEditedOrder() {
         </table>
       </div>
 
-      <!-- Bot. but. -->
       <div class="flex justify-end pr-[80px] pt-[14px] items-center">
         <span style="margin-right: 14px;">
           {{ (currentPage - 1) * perPage + 1 }} -
@@ -170,7 +169,7 @@ function saveEditedOrder() {
       </div>
     </div>
 
-    <div v-if="showAddModal" class="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center">
+    <div v-if="showAddModal" class="fixed inset-0 bg-black/30 flex justify-center items-center">
       <div class="bg-white p-6 rounded-lg shadow-lg w-[400px]">
         <h2 class="text-xl font-bold mb-4 text-center">Add New Order</h2>
 

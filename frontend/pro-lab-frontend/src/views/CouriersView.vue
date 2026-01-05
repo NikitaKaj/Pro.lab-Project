@@ -162,7 +162,7 @@ function saveEditedOrder() {
             </div>
         </div>
 
-        <div v-if="showModal" class="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center">
+        <div v-if="showModal" class="fixed inset-0 bg-black/30 flex justify-center items-center">
             <div class="bg-white p-6 rounded-lg shadow-lg w-[400px]">
                 <h2 class="text-xl font-bold mb-4 text-center">Add Courier</h2>
 
