@@ -12,6 +12,7 @@ namespace ProLab.Data.Entities.Orders
     public class Order : BaseEntity<long>
     {
         public long ClientId { get; set; }
+        public string? CustomerName { get; set; }
         public long CourierId { get; set; }
         public long? RouteId { get; set; }
         public string Address { get; set; }

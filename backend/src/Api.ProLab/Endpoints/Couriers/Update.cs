@@ -8,7 +8,7 @@ namespace ProLab.Api.Endpoints;
 
 public class UpdateCourier : EndpointBaseAsync
     .WithRequest<UpdateCourierRequest>
-    .WithActionResult<UpdateCourierResponse>
+    .WithActionResult
 {
     private readonly ApplicationDbContext ctx;
 
@@ -20,9 +20,9 @@ public class UpdateCourier : EndpointBaseAsync
     [HttpPost($"api/{Constants.COURIERS}/update")]
     [OpenApiTag(Constants.COURIERS)]
     [OpenApiOperation(Constants.COURIERS + "_update")]
-    [ProducesResponseType(typeof(UpdateCourierResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public override async Task<ActionResult<UpdateCourierResponse>> HandleAsync([FromBody] UpdateCourierRequest request, CancellationToken cancellationToken = default)
+    public override async Task<ActionResult> HandleAsync([FromBody] UpdateCourierRequest request, CancellationToken cancellationToken = default)
     {
         if (request.FullName == null)
         {
@@ -50,14 +50,7 @@ public class UpdateCourier : EndpointBaseAsync
             courier.UpdatedAt = DateTime.UtcNow;
             await ctx.SaveChangesAsync(cancellationToken);
 
-            var response = new UpdateCourierResponse()
-            {
-                Id = courier.Id,
-                FullName = courier.FullName,
-                UpdatedAt = DateTime.UtcNow
-            };
-
-            return Ok(response);
+            return Ok();
         }
         catch (Exception ex)
         {
@@ -79,10 +72,4 @@ public class UpdateCourierRequest
     public string FullName { get; set; }
 
 
-}
-public class UpdateCourierResponse
-{
-    public long Id { get; set; }
-    public string FullName { get; set; }
-    public DateTime UpdatedAt { get; set; }
 }

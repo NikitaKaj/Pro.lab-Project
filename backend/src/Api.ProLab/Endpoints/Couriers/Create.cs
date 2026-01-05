@@ -36,7 +36,6 @@ public class CreateCourier : EndpointBaseAsync
         {
             var courier = new Courier
             {
-                //Id = request.Id,
                 FullName = request.FullName,
                 UpdatedAt = null,
                 CreatedAt = DateTime.UtcNow
