@@ -1,24 +1,23 @@
 <script setup lang="ts">
 import Sidebar from '@/components/SideBar.vue'
 import PageHeader from '@/components/PageHeader.vue'
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import { OrdersClient, OrderStatus, type GetOrderResponse } from '@/api-client/clients'
 
-const items = ref([
-  { id: "#12346", created: "29.12.2025", customer: "Max Verstpen", address: "Paula leiņa 6, 12", time: "12:30 - 14:00" },
-  { id: "#12347", created: "29.12.2025", customer: "Max Verstpen", address: "Paula leiņa 6, 12", time: "12:30 - 14:00" },
-  { id: "#12348", created: "29.12.2025", customer: "Max Verstpen", address: "Paula leiņa 6, 12", time: "12:30 - 14:00" },
-  { id: "#12349", created: "29.12.2025", customer: "Max Verstpen", address: "Paula leiņa 6, 12", time: "12:30 - 14:00" },
-  { id: "#12350", created: "29.12.2025", customer: "Max Verstpen", address: "Paula leiņa 6, 12", time: "12:30 - 14:00" },
-  { id: "#12351", created: "29.12.2025", customer: "Max Verstpen", address: "Paula leiņa 6, 12", time: "12:30 - 14:00" },
-  { id: "#12352", created: "29.12.2025", customer: "Max Verstpen", address: "Paula leiņa 6, 12", time: "12:30 - 14:00" },
-  { id: "#12353", created: "29.12.2025", customer: "Max Verstpen", address: "Paula leiņa 6, 12", time: "12:30 - 14:00" },
-  { id: "#12354", created: "29.12.2025", customer: "Max Verstpen", address: "Paula leiņa 6, 12", time: "12:30 - 14:00" },
-  { id: "#12355", created: "29.12.2025", customer: "Max Verstpen", address: "Paula leiņa 6, 12", time: "12:30 - 14:00" },
-  { id: "#12356", created: "29.12.2025", customer: "Max Verstpen", address: "Paula leiņa 6, 12", time: "12:30 - 14:00" },
-  { id: "#12357", created: "29.12.2025", customer: "Max Verstpen", address: "Paula leiņa 6, 12", time: "12:30 - 14:00" },
-  { id: "#12358", created: "29.12.2025", customer: "Max Verstpen", address: "Paula leiņa 6, 12", time: "12:30 - 14:00" },
-  { id: "#12359", created: "29.12.2025", customer: "Max Verstpen", address: "Paula leiņa 6, 12", time: "12:30 - 14:00" },
-])
+type OrderRow = {
+  id: number
+  created: string
+  customer: string
+  address: string
+  status: OrderStatus
+}
+
+const baseUrl = import.meta.env.VITE_API_BASE_URL ?? 'https://localhost:5001'
+const ordersApi = new OrdersClient(baseUrl)
+
+const items = ref<OrderRow[]>([])
+const loading = ref(false)
+const error = ref<string | null>(null)
 
 const currentPage = ref(1)
 const perPage = 10
@@ -38,72 +37,109 @@ function prevPage() {
   if (currentPage.value > 1) currentPage.value--
 }
 
-function deleteOrder(id: string) {
-  items.value = items.value.filter(o => o.id !== id)
+function formatDateRu(value: string | null) {
+  if (!value) return '-'
+  const d = new Date(value)
+  if (Number.isNaN(d.getTime())) return value
+  return d.toLocaleDateString('ru-RU')
+}
+
+function toRow(o: GetOrderResponse): OrderRow {
+  return {
+    id: o.orderId,
+    created: formatDateRu(o.createdAt),
+    customer: o.customer ?? '-',
+    address: o.address ?? '-',
+    status: o.status,
+  }
+}
+
+async function loadOrders() {
+  loading.value = true
+  error.value = null
+  try {
+    const data = await ordersApi.get()
+    items.value = (data ?? []).map(toRow)
+    if (currentPage.value > totalPages.value) currentPage.value = Math.max(1, totalPages.value)
+  } catch (e: any) {
+    error.value = e?.message ?? 'Failed to load orders'
+  } finally {
+    loading.value = false
+  }
+}
+
+async function deleteOrder(id: number) {
+  try {
+    await ordersApi.delete(id)
+    items.value = items.value.filter(x => x.id !== id)
+    if (currentPage.value > totalPages.value) currentPage.value = Math.max(1, totalPages.value)
+  } catch (e: any) {
+    alert(e?.message ?? 'Delete failed')
+  }
+}
+
+async function setStatus(id: number, status: OrderStatus) {
+  try {
+    await ordersApi.update(id, status)
+    const row = items.value.find(x => x.id === id)
+    if (row) row.status = status
+  } catch (e: any) {
+    alert(e?.message ?? 'Update status failed')
+  }
+}
+
+function statusLabel(s: OrderStatus) {
+  switch (s) {
+    case OrderStatus.Pending: return 'Pending'
+    case OrderStatus.InRoute: return 'InRoute'
+    case OrderStatus.Completed: return 'Completed'
+    case OrderStatus.Cancelled: return 'Cancelled'
+    default: return String(s)
+  }
 }
 
 const showAddModal = ref(false)
-const showEditModal = ref(false)
-const editIndex = ref<number | null>(null)
 
 const newOrder = ref({
-  customer: "",
-  address: "",
-  time: "",
+  customer: '',
+  address: '',
+  status: OrderStatus.Pending as OrderStatus,
 })
 
-function generateId() {
-  return "#" + Math.floor(10000 + Math.random() * 90000)
-}
-
 function openAddModal() {
-  newOrder.value = { customer: "", address: "", time: "" }
+  newOrder.value = {
+    customer: '',
+    address: '',
+    status: OrderStatus.Pending,
+  }
   showAddModal.value = true
 }
 
-function addOrder() {
-  if (!newOrder.value.customer || !newOrder.value.address) return
+function nextTempId() {
+  const maxId = items.value.reduce((m, x) => Math.max(m, x.id), 0)
+  return maxId + 1
+}
 
-  items.value.push({
-    id: generateId(),
-    created: new Date().toLocaleDateString(),
-    customer: newOrder.value.customer,
-    address: newOrder.value.address,
-    time: newOrder.value.time || "12:00 - 14:00"
-  })
+function addOrderLocal() {
+  if (!newOrder.value.customer.trim() || !newOrder.value.address.trim()) return
 
+  const now = new Date()
+  const row: OrderRow = {
+    id: nextTempId(),
+    created: now.toLocaleDateString('ru-RU'),
+    customer: newOrder.value.customer.trim(),
+    address: newOrder.value.address.trim(),
+    status: newOrder.value.status,
+  }
+
+  items.value = [row, ...items.value]
   showAddModal.value = false
-  newOrder.value = { customer: "", address: "", time: "" }
+
+  currentPage.value = 1
 }
 
-function openEditModal(order: any, index: number) {
-  editIndex.value = index
-  newOrder.value = {
-    customer: order.customer,
-    address: order.address,
-    time: order.time
-  }
-  showEditModal.value = true
-}
-
-function saveEditedOrder() {
-  if (editIndex.value !== null) {
-    items.value[editIndex.value] = {
-      ...items.value[editIndex.value],
-      customer: newOrder.value.customer,
-      address: newOrder.value.address,
-      time: newOrder.value.time
-    }
-  }
-
-  showEditModal.value = false
-  editIndex.value = null
-
-  newOrder.value = { customer: "", address: "", time: "" }
-}
+onMounted(loadOrders)
 </script>
-
-
 
 <template>
   <div class="flex min-h-screen bg-white text-gray-900">
@@ -112,37 +148,82 @@ function saveEditedOrder() {
     <div class="flex-1 px-12 py-12">
       <PageHeader title="Orders" />
 
-      <div class="mt-6 flex justify-end pr-[80px] pb-[10px]">
-        <button @click="openAddModal" class="border border-[#1673ea] text-[#1673ea] font-semibold px-7 py-3.5 
-                 rounded-md shadow bg-white hover:bg-[#1673ea] hover:text-white transition">
-          Add Order
-        </button>
+      <div class="mt-4 flex items-center justify-between pr-[80px]">
+        <div class="text-sm text-gray-600">
+          <span v-if="loading">Loading…</span>
+          <span v-else-if="error" class="text-red-600">{{ error }}</span>
+          <span v-else>&nbsp;</span>
+        </div>
+
+        <div class="flex gap-3">
+          <button
+            class="border border-[#1673ea] text-[#1673ea] font-semibold px-5 py-2.5 rounded-md shadow bg-white hover:bg-[#1673ea] hover:text-white transition"
+            @click="openAddModal"
+          >
+            Add Order
+          </button>
+
+          <button
+            class="border border-gray-300 text-gray-700 font-semibold px-5 py-2.5 rounded-md shadow bg-white hover:bg-gray-100 transition"
+            @click="loadOrders"
+          >
+            Refresh
+          </button>
+        </div>
       </div>
 
-      <div class="flex justify-center">
+      <div class="flex justify-center !mt-5">
         <table class="table-fixed border-2 w-[90%] bg-white">
           <thead class="border-2 font-bold">
             <tr>
-              <th class="border p-3">ID</th>
-              <th class="border">Created</th>
-              <th class="border">Customer</th>
-              <th class="border">Address</th>
-              <th class="border">TimeLog</th>
-              <th class="border">Actions</th>
+              <th class="border p-3 w-[10%]">ID</th>
+              <th class="border w-[15%]">Created</th>
+              <th class="border w-[18%]">Customer</th>
+              <th class="border w-[25%]">Address</th>
+              <th class="border w-[12%]">Status</th>
+              <th class="border w-[10%]">Actions</th>
             </tr>
           </thead>
 
           <tbody>
-            <tr v-for="(order, index) in paginatedItems" :key="order.id" class="text-center border">
-              <td class="border p-3">{{ order.id }}</td>
+            <tr v-if="!loading && paginatedItems.length === 0">
+              <td class="border p-6 text-center text-gray-500" colspan="7">
+                No orders yet
+              </td>
+            </tr>
+
+            <tr
+              v-else
+              v-for="order in paginatedItems"
+              :key="order.id"
+              class="text-center border"
+            >
+              <td class="border p-3">#{{ order.id }}</td>
               <td class="border">{{ order.created }}</td>
               <td class="border">{{ order.customer }}</td>
               <td class="border">{{ order.address }}</td>
-              <td class="border">{{ order.time }}</td>
+
+              <td class="border">
+                <select
+                  class="border rounded px-2 py-1 bg-white"
+                  :value="order.status"
+                  @change="setStatus(order.id, Number(($event.target as HTMLSelectElement).value) as any)"
+                >
+                  <option :value="OrderStatus.Pending">{{ statusLabel(OrderStatus.Pending) }}</option>
+                  <option :value="OrderStatus.InRoute">{{ statusLabel(OrderStatus.InRoute) }}</option>
+                  <option :value="OrderStatus.Completed">{{ statusLabel(OrderStatus.Completed) }}</option>
+                  <option :value="OrderStatus.Cancelled">{{ statusLabel(OrderStatus.Cancelled) }}</option>
+                </select>
+              </td>
+
               <td class="border p-3">
                 <div class="flex items-center justify-center gap-6 cursor-pointer">
-                  <img src="@/assets/images/DeleteUser.png" class="w-6" @click="deleteOrder(order.id)" />
-                  <img src="@/assets/images/EditUser.png" class="w-6" @click="openEditModal(order, index)" />
+                  <img
+                    src="@/assets/images/DeleteUser.png"
+                    class="w-6"
+                    @click="deleteOrder(order.id)"
+                    title="Delete"
+                  />
                 </div>
               </td>
             </tr>
@@ -152,64 +233,76 @@ function saveEditedOrder() {
 
       <div class="flex justify-end pr-[80px] pt-[14px] items-center">
         <span style="margin-right: 14px;">
-          {{ (currentPage - 1) * perPage + 1 }} -
+          {{ items.length === 0 ? 0 : (currentPage - 1) * perPage + 1 }} -
           {{ Math.min(currentPage * perPage, items.length) }} of
           {{ items.length }}
         </span>
 
-        <button @click="prevPage" :disabled="currentPage === 1"
-          class="px-3 py-1 border rounded disabled:opacity-40">‹</button>
+        <button
+          @click="prevPage"
+          :disabled="currentPage === 1"
+          class="px-3 py-1 border rounded disabled:opacity-40"
+        >
+          ‹
+        </button>
 
         <span class="mx-2 px-3 py-1 border rounded bg-gray-100">
           {{ currentPage }}
         </span>
 
-        <button @click="nextPage" :disabled="currentPage === totalPages"
-          class="px-3 py-1 border rounded disabled:opacity-40">›</button>
+        <button
+          @click="nextPage"
+          :disabled="currentPage === totalPages || totalPages === 0"
+          class="px-3 py-1 border rounded disabled:opacity-40"
+        >
+          ›
+        </button>
       </div>
     </div>
 
-    <div v-if="showAddModal" class="fixed inset-0 bg-black/30 flex justify-center items-center">
-      <div class="bg-white p-6 rounded-lg shadow-lg w-[400px]">
-        <h2 class="text-xl font-bold mb-4 text-center">Add New Order</h2>
+    <div v-if="showAddModal" class="fixed inset-0 bg-black/30 flex justify-center items-center z-50">
+      <div class="bg-white p-6 rounded-lg shadow-lg w-[420px]">
+        <h2 class="text-xl font-bold mb-4 text-center !mb-5">Add New Order</h2>
 
-        <input v-model="newOrder.customer" type="text" placeholder="Customer" class="w-full border p-2 rounded mb-3"
-          style="margin-bottom: 10px;" />
-        <input v-model="newOrder.address" type="text" placeholder="Address" class="w-full border p-2 rounded mb-3"
-          style="margin-bottom: 10px;" />
-        <input v-model="newOrder.time" type="text" placeholder="TimeLog (12:30 - 14:00)"
-          class="w-full border p-2 rounded mb-4" style="margin-bottom: 10px;" />
+        <input
+          v-model="newOrder.customer"
+          type="text"
+          placeholder="Customer"
+          class="w-full border p-2 rounded mb-3"
+          style="margin-bottom: 10px;"
+        />
 
-        <div class="flex justify-between">
-          <button @click="showAddModal = false" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Cancel</button>
+        <input
+          v-model="newOrder.address"
+          type="text"
+          placeholder="Address"
+          class="w-full border p-2 rounded mb-3"
+          style="margin-bottom: 10px;"
+        />
 
-          <button @click="addOrder" class="px-4 py-2 bg-[#1673ea] text-white rounded hover:bg-[#105fc6]">
+        <select v-model="newOrder.status" class="w-full border p-2 rounded mb-4 bg-white">
+          <option :value="OrderStatus.Pending">Pending</option>
+          <option :value="OrderStatus.InRoute">InRoute</option>
+          <option :value="OrderStatus.Completed">Completed</option>
+          <option :value="OrderStatus.Cancelled">Cancelled</option>
+        </select>
+
+        <div class="flex justify-between !mt-5">
+          <button
+            @click="showAddModal = false"
+            class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+          >
+            Cancel
+          </button>
+
+          <button
+            @click="addOrderLocal"
+            class="px-4 py-2 bg-[#1673ea] text-white rounded hover:bg-[#105fc6]"
+          >
             Add
           </button>
         </div>
       </div>
     </div>
-
-    <div v-if="showEditModal" class="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center">
-      <div class="bg-white p-6 rounded-lg shadow-lg w-[400px]">
-        <h2 class="text-xl font-bold mb-4 text-center">Edit Order</h2>
-
-        <input v-model="newOrder.customer" type="text" placeholder="Customer" class="w-full border p-2 rounded mb-3"
-          style="margin-bottom: 10px;" />
-        <input v-model="newOrder.address" type="text" placeholder="Address" class="w-full border p-2 rounded mb-3"
-          style="margin-bottom: 10px;" />
-        <input v-model="newOrder.time" type="text" placeholder="TimeLog (12:30 - 14:00)"
-          class="w-full border p-2 rounded mb-4" style="margin-bottom: 10px;" />
-
-        <div class="flex justify-between">
-          <button @click="showEditModal = false" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Cancel</button>
-
-          <button @click="saveEditedOrder" class="px-4 py-2 bg-[#1673ea] text-white rounded hover:bg-[#105fc6]">
-            Save
-          </button>
-        </div>
-      </div>
-    </div>
-
   </div>
 </template>

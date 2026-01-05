@@ -91,7 +91,6 @@ function clearPoints() {
       </div>
 
       <div class="flex gap-6">
-        <!-- Карта -->
         <div class="w-2/3 bg-white rounded-lg border border-gray-200 shadow-sm h-[600px] flex items-center justify-center">
           <MapView
             v-model:coordinates="selectedCoordinates"
@@ -100,7 +99,6 @@ function clearPoints() {
           />
         </div>
 
-        <!-- Правая панель -->
         <div class="w-1/3 bg-white rounded-lg border border-gray-200 shadow-sm p-4">
           <h2 class="text-lg text-black font-semibold mb-2">Selected points</h2>
           <p class="text-sm text-gray-600 mb-4">

@@ -1,6 +1,5 @@
 <template>
   <div class="flex h-screen">
-    <!-- Левая часть -->
     <div class="w-1/2 bg-gray-50 flex flex-col items-center justify-center">
       <div class="text-center">
         <img
@@ -11,7 +10,6 @@
       </div>
     </div>
 
-    <!-- Правая часть -->
     <div class="w-1/2 bg-blue-600 flex items-center justify-center">
       <div class="bg-white rounded-lg shadow-lg p-10 w-80">
         <h2 class="text-2xl font-bold text-center !mb-4 text-gray-800">
