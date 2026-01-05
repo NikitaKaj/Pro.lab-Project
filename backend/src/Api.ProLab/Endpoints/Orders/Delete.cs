@@ -1,28 +1,26 @@
 using Ardalis.ApiEndpoints;
 using ProLab.Data;
-using ProLab.Data.Entities.Couriers;
 using System.ComponentModel.DataAnnotations;
-using System.Diagnostics.Metrics;
 
 namespace ProLab.Api.Endpoints;
 
-public class DeleteCourier : EndpointBaseAsync
-    .WithRequest<DeleteCourierRequest>
+public class DeleteOrder : EndpointBaseAsync
+    .WithRequest<DeleteOrderRequest>
     .WithActionResult
 {
     private readonly ApplicationDbContext ctx;
 
-    public DeleteCourier(ApplicationDbContext ctx)
+    public DeleteOrder(ApplicationDbContext ctx)
     {
         this.ctx = ctx;
     }
 
-    [HttpPost($"api/{Constants.COURIERS}/delete")]
-    [OpenApiTag(Constants.COURIERS)]
-    [OpenApiOperation(Constants.COURIERS + "_delete")]
+    [HttpPost($"api/{Constants.ORDERS}/delete")]
+    [OpenApiTag(Constants.ORDERS)]
+    [OpenApiOperation(Constants.ORDERS + "_delete")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public override async Task<ActionResult> HandleAsync([FromQuery] DeleteCourierRequest request, CancellationToken cancellationToken = default)
+    public override async Task<ActionResult> HandleAsync([FromQuery] DeleteOrderRequest request, CancellationToken cancellationToken = default)
     {
         if (request.Id <= 0)
         {
@@ -35,8 +33,8 @@ public class DeleteCourier : EndpointBaseAsync
         }
         try
         {
-            var courier = await ctx.Couriers.FindAsync(request.Id, cancellationToken);
-            if (courier == null)
+            var order = await ctx.Orders.FindAsync(request.Id, cancellationToken);
+            if (order == null)
             {
                 return BadRequest(new ProblemDetails
                 {
@@ -45,7 +43,7 @@ public class DeleteCourier : EndpointBaseAsync
                     Status = StatusCodes.Status400BadRequest
                 });
             }
-            ctx.Couriers.Remove(courier);
+            ctx.Orders.Remove(order);
             await ctx.SaveChangesAsync(cancellationToken);
 
             return Ok();
@@ -62,7 +60,7 @@ public class DeleteCourier : EndpointBaseAsync
     }
 }
 
-public class DeleteCourierRequest
+public class DeleteOrderRequest
 {
     [Required]
     public long Id { get; set; }

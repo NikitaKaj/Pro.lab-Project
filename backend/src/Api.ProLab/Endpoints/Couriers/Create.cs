@@ -45,7 +45,7 @@ public class CreateCourier : EndpointBaseAsync
             await ctx.SaveChangesAsync(cancellationToken);
             var response = new CreateCourierResponse()
             {
-                Id = "Kurjera ID:" + courier.Id
+                Id = courier.Id
             };
 
             return Ok(response);
@@ -74,5 +74,5 @@ public class CreateCourierRequest
 }
 public class CreateCourierResponse
 {
-    public string Id { get; set; }
+    public long Id { get; set; }
 }
