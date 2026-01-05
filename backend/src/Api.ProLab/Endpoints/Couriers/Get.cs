@@ -1,11 +1,12 @@
 using Ardalis.ApiEndpoints;
+using ProLab.Api.Responses.CouriersResponses;
 using ProLab.Data;
 
 namespace ProLab.Api.Endpoints;
 
 public class GetCourier : EndpointBaseAsync
-    .WithRequest<GetCourierRequest>
-    .WithActionResult<GetCourierResponse>
+    .WithoutRequest
+    .WithActionResult<List<GetCourierResponse>>
 {
     private readonly ApplicationDbContext ctx;
 
@@ -17,38 +18,21 @@ public class GetCourier : EndpointBaseAsync
     [HttpGet($"api/{Constants.COURIERS}/get")]
     [OpenApiTag(Constants.COURIERS)]
     [OpenApiOperation(Constants.COURIERS + "_get")]
-    [ProducesResponseType(typeof(GetCourierResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(List<GetCourierResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public override async Task<ActionResult<GetCourierResponse>> HandleAsync([FromQuery] GetCourierRequest request, CancellationToken cancellationToken = default)
+    public override async Task<ActionResult<List<GetCourierResponse>>> HandleAsync(CancellationToken cancellationToken = default)
     {
-        if (request.Id <= 0)
-        {
-            return BadRequest(new ProblemDetails
-            {
-                Title = "Nepareizs vaicajums",
-                Detail = "Id nav numurs",
-                Status = StatusCodes.Status400BadRequest
-            });
-        }
         try
         {
-            var courier = await ctx.Couriers.FirstOrDefaultAsync(x => x.Id == request.Id);
-            if(courier == null) 
-            {
-                return BadRequest(new ProblemDetails
+            var response = await ctx.Couriers
+                .Select(c => new CourierResponse
                 {
-                    Title = "Nepareizs vaicajums",
-                    Detail = "Nav tada kurjera",
-                    Status = StatusCodes.Status400BadRequest
-                });
-            }
-            var response = new CourierDataResponse()
-            {
-                CourierId = courier.Id,
-                FullName = courier.FullName,
-                UpdatedAt = (DateTimeOffset)courier.UpdatedAt,
-                CreatedAt = courier.CreatedAt
-            };
+                    CourierId = c.Id,
+                    FullName = c.FullName,
+                    CompletedOrdersCount = ctx.Orders.Count(o => o.CourierId == c.Id),
+                    CreatedAt = c.CreatedAt
+                })
+                .ToListAsync(cancellationToken);
 
             return Ok(response);
         }
@@ -64,11 +48,6 @@ public class GetCourier : EndpointBaseAsync
     }
 }
 
-public class GetCourierRequest
-{
-    [FromQuery]
-    public long Id { get; set; }
-}
 public class GetCourierResponse
 {
     public long CourierId { get; set; }
