@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using ProLab.Data.Entities.Orders;
-using ProLab.Data.Entities.Clients;
 using ProLab.Data.Entities.Couriers;
 using ProLab.Data.Entities.Routes;
 
@@ -22,7 +21,6 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<long>, 
 
 	public DbSet<LogEntry> LogEntries => Set<LogEntry>();
 		public DbSet<Order> Orders { get; set; }
-        public DbSet<Client> Clients { get; set; }
         public DbSet<Courier> Couriers { get; set; }
         public DbSet<Route> Routes { get; set; }
 
@@ -38,11 +36,6 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<long>, 
 		builder.Entity<Order>(e =>
 		{
 			e.HasKey(x => x.Id);
-
-			e.HasOne<Client>()
-				.WithMany()
-				.HasForeignKey(o => o.ClientId)
-				.OnDelete(DeleteBehavior.Restrict);
 
 			e.HasOne<Courier>()
 				.WithMany()
