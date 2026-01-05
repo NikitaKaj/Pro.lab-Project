@@ -3,13 +3,13 @@ using ProLab.Data;
 
 namespace ProLab.Api.Endpoints;
 
-public class GetCourierData : EndpointBaseAsync
-    .WithRequest<CourierDataRequest>
-    .WithActionResult<CourierDataResponse>
+public class GetCourier : EndpointBaseAsync
+    .WithRequest<GetCourierRequest>
+    .WithActionResult<GetCourierResponse>
 {
     private readonly ApplicationDbContext ctx;
 
-    public GetCourierData(ApplicationDbContext ctx)
+    public GetCourier(ApplicationDbContext ctx)
     {
         this.ctx = ctx;
     }
@@ -17,9 +17,9 @@ public class GetCourierData : EndpointBaseAsync
     [HttpGet($"api/{Constants.COURIERS}/get")]
     [OpenApiTag(Constants.COURIERS)]
     [OpenApiOperation(Constants.COURIERS + "_get")]
-    [ProducesResponseType(typeof(CourierDataResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(GetCourierResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public override async Task<ActionResult<CourierDataResponse>> HandleAsync([FromQuery] CourierDataRequest request, CancellationToken cancellationToken = default)
+    public override async Task<ActionResult<GetCourierResponse>> HandleAsync([FromQuery] GetCourierRequest request, CancellationToken cancellationToken = default)
     {
         if (request.Id <= 0)
         {
@@ -64,12 +64,12 @@ public class GetCourierData : EndpointBaseAsync
     }
 }
 
-public class CourierDataRequest
+public class GetCourierRequest
 {
     [FromQuery]
     public long Id { get; set; }
 }
-public class CourierDataResponse
+public class GetCourierResponse
 {
     public long CourierId { get; set; }
     public string FullName { get; set; }
