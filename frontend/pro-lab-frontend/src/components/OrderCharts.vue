@@ -1,41 +1,70 @@
 <script setup lang="ts">
 import { Chart, registerables, type ChartConfiguration, type ChartData } from 'chart.js'
-import { onMounted, onBeforeUnmount, ref } from 'vue'
+import { onMounted, onBeforeUnmount, ref, watch } from 'vue'
 Chart.register(...registerables)
 
 const props = defineProps<{ labels: string[]; series: number[] }>()
 const el = ref<HTMLCanvasElement | null>(null)
-let chart: Chart | null = null
+let chart: Chart<'line'> | null = null
 
-onMounted(() => {
-  if (!el.value) return
-  const data: ChartData<'line'> = {
+function buildData(): ChartData<'line'> {
+  return {
     labels: props.labels,
-    datasets: [{
-      data: props.series,
-      fill: true,
-      borderColor: '#0e5fd8',
-      backgroundColor: 'rgba(14,95,216,.12)',
-      tension: 0.46,
-      pointRadius: 0,
-      borderWidth: 5,
-    }],
+    datasets: [
+      {
+        data: props.series,
+        fill: true,
+        borderColor: '#0e5fd8',
+        backgroundColor: 'rgba(14,95,216,.12)',
+        tension: 0.46,
+        pointRadius: 0,
+        borderWidth: 5,
+      },
+    ],
   }
+}
+
+function ensureChart() {
+  if (!el.value) return
+
   const cfg: ChartConfiguration<'line'> = {
     type: 'line',
-    data,
+    data: buildData(),
     options: {
       responsive: true,
       maintainAspectRatio: false,
       scales: {
-        y: { beginAtZero: true, grid: { color: '#e5e7eb' } },
+        y: {
+          beginAtZero: true,
+          ticks: { precision: 0 },
+          grid: { color: '#e5e7eb' },
+        },
         x: { grid: { color: '#eef2f7' } },
       },
       plugins: { legend: { display: false } },
     },
   }
+
   chart = new Chart(el.value, cfg)
+}
+
+function updateChart() {
+  if (!chart) return
+  chart.data.labels = props.labels
+  chart.data.datasets[0].data = props.series
+  chart.update()
+}
+
+onMounted(() => {
+  ensureChart()
+  updateChart()
 })
+
+watch(
+  () => [props.labels, props.series] as const,
+  () => updateChart(),
+  { deep: true }
+)
 
 onBeforeUnmount(() => chart?.destroy())
 </script>
@@ -50,5 +79,3 @@ onBeforeUnmount(() => chart?.destroy())
     </div>
   </section>
 </template>
-
-
