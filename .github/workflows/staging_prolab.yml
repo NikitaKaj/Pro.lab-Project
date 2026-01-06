@@ -1,0 +1,105 @@
+name: Update
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - 'backend/src/Api.ProLab/**'
+      - 'frontend/pro-lab-frontend/**'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        dotnet: [ '8.0.x' ]
+    steps:
+      - uses: actions/checkout@v3
+
+      # - name: Install Node Modules
+      #   working-directory: ./src/frontend-goldboost-01
+      #   run: npm i
+      - uses: pnpm/action-setup@v2
+        name: Install pnpm
+        id: pnpm-install
+        with:
+          version: 8
+          run_install: false
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+  
+      - uses: actions/cache@v3
+        name: Setup pnpm cache
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Services Install Node.js dependencies
+        working-directory: ./frontend/pro-lab-frontend
+        run: pnpm install
+
+      - name: Build Vite
+        working-directory: ./frontend/pro-lab-frontend
+        run: pnpm run build
+        env:
+          NODE_CONFIG: staging
+    
+      - name: Set up .NET Core
+        uses: actions/setup-dotnet@v2
+        id: stepid
+        with:
+          dotnet-version: ${{ matrix.dotnet }}
+
+      - name: Cache net packages
+        uses: actions/cache@v3  
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('./backend/src/Api.ProLab/packages.lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+
+      - name: Create temporary global.json
+        run: |
+          echo '{"sdk":{"version": "${{ steps.stepid.outputs.dotnet-version }}"}}' > ./global.json
+          
+      - name: Build with dotnet
+        working-directory: ./backend/src/Api.ProLab/
+        run: dotnet build Api.ProLab.csproj --configuration Release
+
+      - name: dotnet publish
+        working-directory: ./backend/src/Api.ProLab/
+        run: dotnet publish Api.ProLab.csproj -c Release -o ${{env.DOTNET_ROOT}}/myapp
+
+      - name: Upload artifact for deployment job
+        uses: actions/upload-artifact@v4
+        with:
+          name: .net-app
+          path: ${{env.DOTNET_ROOT}}/myapp
+
+  deploy:
+    runs-on: windows-latest
+    needs: build
+    environment:
+      name: 'staging'
+      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+
+    steps:
+      - name: Download artifact from build job
+        uses: actions/download-artifact@v4
+        with:
+          name: .net-app
+
+      - name: Deploy to Azure Web App
+        id: deploy-to-webapp
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: 'prolab'
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
+          package: .
