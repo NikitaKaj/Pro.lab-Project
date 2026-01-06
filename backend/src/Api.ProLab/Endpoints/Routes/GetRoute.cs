@@ -41,7 +41,7 @@ public class GetRoute : EndpointBaseAsync
         CancellationToken cancellationToken = default)
     {
         var orders = await _ctx.Orders
-            .Where(o => o.CourierId == request.CourierId)
+            .Where(o => o.CourierId == request.CourierId && o.Status == OrderStatus.Pending)
             .ToListAsync(cancellationToken);
 
         if (!orders.Any())
