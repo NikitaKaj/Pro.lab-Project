@@ -7,9 +7,6 @@ import OrdersChart from '@/components/OrderCharts.vue'
 import { ref, onMounted, computed } from 'vue'
 import { OrdersClient, OrderStatus, type GetOrderResponse } from '@/api-client/clients'
 
-function onGenerateRoute() {
-  alert('Generating optimal route…')
-}
 
 const baseUrl = import.meta.env.VITE_API_BASE_URL ?? 'https://localhost:5001'
 const ordersApi = new OrdersClient(baseUrl)
@@ -29,20 +26,23 @@ function startOfWeekMonday(d: Date) {
   return date
 }
 
-function parseCreatedAt(value: string | null): Date | null {
+function parseCreatedAt(value: string | null | undefined): Date | null {
   if (!value) return null
+  const v = String(value).trim()
 
-  const m = value.match(/^(\d{2})\.(\d{2})\.(\d{4})$/)
+  const m = v.match(/^(\d{2})\.(\d{2})\.(\d{4})$/)
   if (m) {
     const dd = Number(m[1])
     const mm = Number(m[2]) - 1
     const yyyy = Number(m[3])
     const d = new Date(yyyy, mm, dd)
-    if (!Number.isNaN(d.getTime())) return d
+    return Number.isNaN(d.getTime()) ? null : d
   }
 
-  return null
+  const d = new Date(v)
+  return Number.isNaN(d.getTime()) ? null : d
 }
+
 
 function weekdayIndexMon0(d: Date) {
   const day = d.getDay()
@@ -69,10 +69,10 @@ const series = computed(() => {
   return buckets as number[]
 })
 
-const completed = computed(() => orders.value.filter(o => o.status === OrderStatus.Completed).length)
-const inProgress = computed(() => orders.value.filter(o => o.status === OrderStatus.InRoute).length)
-const canceled = computed(() => orders.value.filter(o => o.status === OrderStatus.Cancelled).length)
-const ordersToday = computed(() => {
+  const completed = computed(() => orders.value.filter(o => o.status === OrderStatus.Completed).length)
+  const inProgress = computed(() => orders.value.filter(o => o.status === OrderStatus.InRoute).length)
+  const canceled = computed(() => orders.value.filter(o => o.status === OrderStatus.Cancelled).length)
+  const ordersToday = computed(() => {
   const today = new Date()
   today.setHours(0,0,0,0)
   const tomorrow = new Date(today)
@@ -88,16 +88,28 @@ async function loadOrders() {
   loading.value = true
   error.value = null
   try {
-    orders.value = await ordersApi.get()
+    const res = await ordersApi.get()
+    console.log('ordersApi.get() result:', res)
+    orders.value = res ?? []
   } catch (e: any) {
-    error.value = e?.message ?? 'Failed to load orders'
+    console.log('loadOrders error raw:', e)
+
+    error.value =
+      e?.result?.message ??
+      e?.response ??
+      e?.message ??
+      'Failed to load orders'
+
     orders.value = []
   } finally {
     loading.value = false
   }
 }
 
-onMounted(loadOrders)
+
+onMounted(async () => {
+  await loadOrders()
+})
 </script>
 
 <template>
@@ -106,7 +118,7 @@ onMounted(loadOrders)
 
     <main class="flex-1 overflow-auto">
       <div class="w-full px-12 py-12">
-        <PageHeader title="Dashboard" @action="onGenerateRoute" />
+        <PageHeader title="Dashboard"/>
 
         <div class="mt-4 text-sm text-gray-600">
           <span v-if="loading">Loading…</span>
