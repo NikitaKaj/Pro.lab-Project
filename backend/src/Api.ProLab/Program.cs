@@ -110,10 +110,10 @@ try
         subapp.UseEndpoints(endpoints => endpoints.MapControllers());
     });
 
-    app.UseSpa(o =>
-    {
-        o.Options.DefaultPage = "/200.html";
-    });
+    //app.UseSpa(o =>
+    //{
+    //    o.Options.DefaultPage = "/200.html";
+    //});
 
     app.Run();
 }
