@@ -15,9 +15,9 @@ namespace ProLab.Data.Entities.Orders
         public long? RouteId { get; set; }
         public string Address { get; set; }
         public OrderStatus Status { get; set; }
-        public DateTime StartTimeLog { get; set; }
-        public DateTime EndTimeLog { get; set; }
-        public string StartPoint { get; set; }
-        public string EndPoint { get; set; }
+        public DateTime? StartTimeLog { get; set; }
+        public DateTime? EndTimeLog { get; set; }
+        public string? StartPoint { get; set; }
+        public string? EndPoint { get; set; }
     }
 }

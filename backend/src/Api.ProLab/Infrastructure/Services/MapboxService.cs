@@ -147,5 +147,46 @@ namespace ProLab.Api.Infrastructure.Services
 
         private static string FormatCoord(Coordinate c) =>
             $"{c.Longitude.ToString(CultureInfo.InvariantCulture)},{c.Latitude.ToString(CultureInfo.InvariantCulture)}";
+
+        public async Task<Coordinate?> GeocodeAddressAsync(
+    string address,
+    CancellationToken cancellationToken = default)
+        {
+            if (string.IsNullOrWhiteSpace(address))
+                return null;
+
+            var cacheKey = $"geocode_{address.ToLowerInvariant()}";
+
+            if (_cache.TryGetValue<Coordinate>(cacheKey, out var cachedCoordinate))
+                return cachedCoordinate;
+
+            var encodedAddress = Uri.EscapeDataString(address);
+            var url = $"{_options.BaseUrl}/geocoding/v5/mapbox.places/{encodedAddress}.json";
+            var query = $"?access_token={_options.AccessToken}&limit=1";
+            var fullUrl = $"{url}{query}";
+
+            var response = await _httpClient.GetAsync(fullUrl, cancellationToken);
+            response.EnsureSuccessStatusCode();
+
+            var content = await response.Content.ReadAsStringAsync(cancellationToken);
+            var jsonDoc = JsonDocument.Parse(content);
+
+            var features = jsonDoc.RootElement.GetProperty("features");
+
+            if (features.GetArrayLength() == 0)
+                return null;
+
+            var firstFeature = features[0];
+            var coordinates = firstFeature.GetProperty("geometry").GetProperty("coordinates");
+
+            var longitude = coordinates[0].GetDouble();
+            var latitude = coordinates[1].GetDouble();
+
+            var coordinate = new Coordinate(longitude, latitude);
+
+            _cache.Set(cacheKey, coordinate, TimeSpan.FromMinutes(_options.CacheDurationMinutes));
+
+            return coordinate;
+        }
     }
 }

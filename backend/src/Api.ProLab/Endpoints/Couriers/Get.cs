@@ -6,7 +6,7 @@ namespace ProLab.Api.Endpoints;
 
 public class GetCourier : EndpointBaseAsync
     .WithoutRequest
-    .WithActionResult<List<GetCourierResponse>>
+    .WithActionResult<List<CourierResponse>>
 {
     private readonly ApplicationDbContext ctx;
 
@@ -18,9 +18,9 @@ public class GetCourier : EndpointBaseAsync
     [HttpGet($"api/{Constants.COURIERS}/get")]
     [OpenApiTag(Constants.COURIERS)]
     [OpenApiOperation(Constants.COURIERS + "_get")]
-    [ProducesResponseType(typeof(List<GetCourierResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(List<CourierResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public override async Task<ActionResult<List<GetCourierResponse>>> HandleAsync(CancellationToken cancellationToken = default)
+    public override async Task<ActionResult<List<CourierResponse>>> HandleAsync(CancellationToken cancellationToken = default)
     {
         try
         {
@@ -30,7 +30,8 @@ public class GetCourier : EndpointBaseAsync
                     CourierId = c.Id,
                     FullName = c.FullName,
                     CompletedOrdersCount = ctx.Orders.Count(o => o.CourierId == c.Id),
-                    CreatedAt = c.CreatedAt
+                    CreatedAt = c.CreatedAt,
+                    ActiveOrdersCount = ctx.Orders.Count(o => o.CourierId == c.Id && o.Status == Data.Enums.OrderStatus.Pending),
                 })
                 .ToListAsync(cancellationToken);
 
@@ -46,12 +47,4 @@ public class GetCourier : EndpointBaseAsync
             });
         }
     }
-}
-
-public class GetCourierResponse
-{
-    public long CourierId { get; set; }
-    public string FullName { get; set; }
-    public DateTimeOffset UpdatedAt { get; set; }
-    public DateTimeOffset CreatedAt { get; set; }
 }

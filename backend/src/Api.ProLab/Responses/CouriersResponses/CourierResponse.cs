@@ -11,5 +11,6 @@ namespace ProLab.Api.Responses.CouriersResponses
         public string FullName { get; set; }
         public int CompletedOrdersCount { get; set; }
         public DateTimeOffset CreatedAt { get; set; }
+        public int ActiveOrdersCount { get; set; }
     }
 }
