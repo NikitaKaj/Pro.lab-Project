@@ -1,7 +1,11 @@
 <script setup lang="ts">
+import { Bars3Icon } from '@heroicons/vue/24/outline'
 import Sidebar from '@/components/SideBar.vue'
 import PageHeader from '@/components/PageHeader.vue'
 import { ref, computed, onMounted } from 'vue'
+
+
+const sidebarOpen = ref(false)
 import {
   OrdersClient,
   OrderStatus,
@@ -186,17 +190,27 @@ async function addOrder() {
 
 onMounted(async () => {
   await Promise.all([loadOrders(), loadCouriers()])
-})
-</script>
+})</script>
 
 <template>
-  <div class="flex min-h-screen bg-white text-gray-900">
-    <Sidebar />
+  <div class="min-h-screen bg-white text-gray-900 md:flex">
+    <Sidebar v-model:open="sidebarOpen" />
+<div class="flex-1 px-4 py-6 sm:px-6 sm:py-8 lg:px-12 lg:py-12">
+      <div class="flex items-center gap-3">
+          <button
+            class="md:hidden p-2 rounded-md border border-gray-200 bg-white"
+            @click="sidebarOpen = true"
+            aria-label="Open menu"
+          >
+            <Bars3Icon class="w-6 h-6" />
+          </button>
 
-    <div class="flex-1 px-12 py-12">
-      <PageHeader title="Orders" />
+          <div class="flex-1">
+            <PageHeader title="Orders" />
+          </div>
+        </div>
 
-      <div class="mt-4 flex items-center justify-between pr-[80px]">
+      <div class="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:pr-[80px]">
         <div class="text-sm text-gray-600">
           <span v-if="loading">Loading…</span>
           <span v-else-if="error" class="text-red-600">{{ error }}</span>

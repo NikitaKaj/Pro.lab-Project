@@ -1083,6 +1083,7 @@ export interface OptimizeRouteResponse {
     totalDuration: number;
     fullGeometry: CoordinateDto[];
     segments: RouteSegmentDto[] | null;
+    coordinates: Coordinate[] | null;
 }
 
 export interface CoordinateDto {
@@ -1096,6 +1097,11 @@ export interface RouteSegmentDto {
     distance: number;
     duration: number;
     summary: string;
+}
+
+export interface Coordinate {
+    longitude: number;
+    latitude: number;
 }
 
 export interface GetRouteRequest {
