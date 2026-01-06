@@ -190,7 +190,8 @@ async function addOrder() {
 
 onMounted(async () => {
   await Promise.all([loadOrders(), loadCouriers()])
-})</script>
+});
+</script>
 
 <template>
   <div class="min-h-screen bg-white text-gray-900 md:flex">

@@ -146,7 +146,8 @@ async function saveEditedCourier() {
   }
 }
 
-onMounted(loadCouriers)</script>
+onMounted(loadCouriers);
+</script>
 
 <template>
   <div class="min-h-screen bg-white text-gray-900 md:flex">
