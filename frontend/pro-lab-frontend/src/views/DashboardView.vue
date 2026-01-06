@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { Bars3Icon } from '@heroicons/vue/24/outline'
+
 import Sidebar from '@/components/SideBar.vue'
 import PageHeader from '@/components/PageHeader.vue'
 import TopMetricsRow from '@/components/TopMetricsRow.vue'
@@ -7,6 +9,7 @@ import OrdersChart from '@/components/OrderCharts.vue'
 import { ref, onMounted, computed } from 'vue'
 import { OrdersClient, OrderStatus, type GetOrderResponse } from '@/api-client/clients'
 
+const sidebarOpen = ref(false)
 
 const baseUrl = import.meta.env.VITE_API_BASE_URL ?? 'https://localhost:5001'
 const ordersApi = new OrdersClient(baseUrl)
@@ -43,7 +46,6 @@ function parseCreatedAt(value: string | null | undefined): Date | null {
   return Number.isNaN(d.getTime()) ? null : d
 }
 
-
 function weekdayIndexMon0(d: Date) {
   const day = d.getDay()
   return day === 0 ? 6 : day - 1
@@ -69,12 +71,12 @@ const series = computed(() => {
   return buckets as number[]
 })
 
-  const completed = computed(() => orders.value.filter(o => o.status === OrderStatus.Completed).length)
-  const inProgress = computed(() => orders.value.filter(o => o.status === OrderStatus.InRoute).length)
-  const canceled = computed(() => orders.value.filter(o => o.status === OrderStatus.Cancelled).length)
-  const ordersToday = computed(() => {
+const completed = computed(() => orders.value.filter(o => o.status === OrderStatus.Completed).length)
+const inProgress = computed(() => orders.value.filter(o => o.status === OrderStatus.InRoute).length)
+const canceled = computed(() => orders.value.filter(o => o.status === OrderStatus.Cancelled).length)
+const ordersToday = computed(() => {
   const today = new Date()
-  today.setHours(0,0,0,0)
+  today.setHours(0, 0, 0, 0)
   const tomorrow = new Date(today)
   tomorrow.setDate(tomorrow.getDate() + 1)
 
@@ -89,23 +91,14 @@ async function loadOrders() {
   error.value = null
   try {
     const res = await ordersApi.get()
-    console.log('ordersApi.get() result:', res)
     orders.value = res ?? []
   } catch (e: any) {
-    console.log('loadOrders error raw:', e)
-
-    error.value =
-      e?.result?.message ??
-      e?.response ??
-      e?.message ??
-      'Failed to load orders'
-
+    error.value = e?.result?.message ?? e?.response ?? e?.message ?? 'Failed to load orders'
     orders.value = []
   } finally {
     loading.value = false
   }
 }
-
 
 onMounted(async () => {
   await loadOrders()
@@ -113,14 +106,26 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="flex min-h-screen bg-white text-gray-900">
-    <Sidebar />
+  <div class="min-h-screen bg-white text-gray-900 md:flex">
+    <Sidebar v-model:open="sidebarOpen" />
 
     <main class="flex-1 overflow-auto">
-      <div class="w-full px-12 py-12">
-        <PageHeader title="Dashboard"/>
+      <div class="w-full px-4 py-6 sm:px-6 sm:py-8 lg:px-12 lg:py-12">
+        <div class="flex items-center gap-3">
+          <button
+            class="md:hidden p-2 rounded-md border border-gray-200 bg-white"
+            @click="sidebarOpen = true"
+            aria-label="Open menu"
+          >
+            <Bars3Icon class="w-6 h-6" />
+          </button>
 
-        <div class="mt-4 text-sm text-gray-600">
+          <div class="flex-1">
+            <PageHeader title="Dashboard" />
+          </div>
+        </div>
+
+        <div class="mt-3 text-sm text-gray-600">
           <span v-if="loading">Loading…</span>
           <span v-else-if="error" class="text-red-600">{{ error }}</span>
           <span v-else>&nbsp;</span>
@@ -135,7 +140,7 @@ onMounted(async () => {
           ]"
         />
 
-        <div class="mt-8 grid gap-6 xl:grid-cols-[300px,1fr,360px] 2xl:grid-cols-[320px,1fr,380px] !mt-10">
+        <div class="mt-6 grid gap-6">
           <OrdersChart
             class="rounded-lg border border-gray-200 shadow-sm"
             :labels="labels"
