@@ -1,4 +1,5 @@
 ﻿using ProLab.Api.Requests.Routes;
+using ProLab.Data.Entities.Routes;
 
 namespace ProLab.Api.Responses.Routes
 {
@@ -9,6 +10,7 @@ namespace ProLab.Api.Responses.Routes
         public double TotalDuration { get; set; }
         public List<CoordinateDto> FullGeometry { get; set; } = new();
         public List<RouteSegmentDto>? Segments { get; set; }
+        public List<Coordinate>? Coordinates { get; set; }
     }
 
     public class RouteSegmentDto

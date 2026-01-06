@@ -167,7 +167,8 @@ public class GetRoute : EndpointBaseAsync
                     Distance = s.Distance,
                     Duration = s.Duration,
                     Summary = s.Summary
-                }).ToList()
+                }).ToList(),
+                Coordinates = coordinates
             };
 
             return Ok(response);
