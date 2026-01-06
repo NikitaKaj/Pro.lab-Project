@@ -75,7 +75,7 @@ jobs:
 
       - name: dotnet publish
         working-directory: ./backend/src/Api.ProLab/
-        run: dotnet publish Api.ProLab.csproj -c Release -o ${{env.DOTNET_ROOT}}/myapp --self-contained false --runtime linux-x64
+        run: dotnet publish Api.ProLab.csproj -c Release -o ${{env.DOTNET_ROOT}}/myapp
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
