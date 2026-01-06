@@ -85,6 +85,8 @@ Novērtēt maršrutu plānošanas algoritma efektivitāti, analizējot tā darb�
 
 #### Eksperimentu plāns
 
+Eksperimentu plāns tika izstrādāts, sistemātiski kombinējot trīs galvenos ieejas parametrus: kurjeru skaitu (K), maiņas ilgumu (MI) un vidējo apkalpošanas laiku pie klienta (VPT). Katrs eksperiments atbilst atšķirīgam darba scenārijam, kas ļauj analizēt maršrutu plānošanas algoritma uzvedību gan pie zemākas, gan pie augstākas sistēmas noslodzes. Šāda pieeja nodrošina salīdzināmus rezultātus un ļauj identificēt parametru ietekmi uz maršrutu plānošanas laiku un kurjeru noslogojumu.
+
 | Nr. | K | MI (h) | VPT (min) | W (s) | U (%) |
 |----:|--:|-------:|----------:|------:|------:|
 | 1   | 2 | 6      | 5         | 1.6   | 88    |
