@@ -144,7 +144,7 @@ export class CouriersClient extends ClientsBase {
         return Promise.resolve<void>(null as any);
     }
 
-    get( cancelToken?: CancelToken): Promise<GetCourierResponse[]> {
+    get( cancelToken?: CancelToken): Promise<CourierResponse[]> {
         let url_ = this.baseUrl + "/api/couriers/get";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -170,7 +170,7 @@ export class CouriersClient extends ClientsBase {
         });
     }
 
-    protected processGet(response: AxiosResponse): Promise<GetCourierResponse[]> {
+    protected processGet(response: AxiosResponse): Promise<CourierResponse[]> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -185,7 +185,7 @@ export class CouriersClient extends ClientsBase {
             let result200: any = null;
             let resultData200  = _responseText;
             result200 = JSON.parse(resultData200);
-            return Promise.resolve<GetCourierResponse[]>(result200);
+            return Promise.resolve<CourierResponse[]>(result200);
 
         } else if (status === 400) {
             const _responseText = response.data;
@@ -198,7 +198,7 @@ export class CouriersClient extends ClientsBase {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
-        return Promise.resolve<GetCourierResponse[]>(null as any);
+        return Promise.resolve<CourierResponse[]>(null as any);
     }
 
     update(request: UpdateCourierRequest, cancelToken?: CancelToken): Promise<void> {
@@ -388,6 +388,67 @@ export class OrdersClient extends ClientsBase {
         return Promise.resolve<GetOrderResponse[]>(null as any);
     }
 
+    place(request: PlaceOrderRequest, cancelToken?: CancelToken): Promise<SuccessResult> {
+        let url_ = this.baseUrl + "/api/orders/place";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(request);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.transformOptions(options_).then(transformedOptions_ => {
+            return this.instance.request(transformedOptions_);
+        }).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.transformResult(url_, _response, (_response: AxiosResponse) => this.processPlace(_response));
+        });
+    }
+
+    protected processPlace(response: AxiosResponse): Promise<SuccessResult> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<SuccessResult>(result200);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<SuccessResult>(null as any);
+    }
+
     update(id: number | undefined, status: OrderStatus | undefined, cancelToken?: CancelToken): Promise<void> {
         let url_ = this.baseUrl + "/api/orders/update?";
         if (id === null)
@@ -463,6 +524,74 @@ export class RoutesClient extends ClientsBase {
 
         this.baseUrl = baseUrl ?? "https://localhost:5001";
 
+    }
+
+    getRoute(request: GetRouteRequest, cancelToken?: CancelToken): Promise<OptimizeRouteResponse> {
+        let url_ = this.baseUrl + "/api/routes/generate";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(request);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.transformOptions(options_).then(transformedOptions_ => {
+            return this.instance.request(transformedOptions_);
+        }).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.transformResult(url_, _response, (_response: AxiosResponse) => this.processGetRoute(_response));
+        });
+    }
+
+    protected processGetRoute(response: AxiosResponse): Promise<OptimizeRouteResponse> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = JSON.parse(resultData200);
+            return Promise.resolve<OptimizeRouteResponse>(result200);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = JSON.parse(resultData400);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status === 500) {
+            const _responseText = response.data;
+            let result500: any = null;
+            let resultData500  = _responseText;
+            result500 = JSON.parse(resultData500);
+            return throwException("A server side error occurred.", status, _responseText, _headers, result500);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<OptimizeRouteResponse>(null as any);
     }
 
     login(request: OptimizeRouteRequest, cancelToken?: CancelToken): Promise<OptimizeRouteResponse> {
@@ -907,11 +1036,12 @@ export interface CreateCourierRequest {
     fullName: string;
 }
 
-export interface GetCourierResponse {
+export interface CourierResponse {
     courierId: number;
     fullName: string;
-    updatedAt: Date;
+    completedOrdersCount: number;
     createdAt: Date;
+    activeOrdersCount: number;
 }
 
 export interface UpdateCourierRequest {
@@ -937,6 +1067,16 @@ export enum OrderStatus {
     Cancelled = 3,
 }
 
+export interface SuccessResult {
+}
+
+export interface PlaceOrderRequest {
+    customer: string | null;
+    address: string;
+    status: OrderStatus;
+    courierId: number;
+}
+
 export interface OptimizeRouteResponse {
     visitOrder: number[];
     totalDistance: number;
@@ -958,9 +1098,8 @@ export interface RouteSegmentDto {
     summary: string;
 }
 
-export interface OptimizeRouteRequest {
-    coordinates: CoordinateDto[];
-    startIndex: number;
+export interface GetRouteRequest {
+    courierId: number;
     algorithm: OptimizationAlgorithm;
     selectionStrategy: SelectionStrategy | null;
 }
@@ -976,6 +1115,13 @@ export enum SelectionStrategy {
     Balanced = 2,
     LightestWeight = 3,
     TimeOfDay = 4,
+}
+
+export interface OptimizeRouteRequest {
+    coordinates: CoordinateDto[];
+    startIndex: number;
+    algorithm: OptimizationAlgorithm;
+    selectionStrategy: SelectionStrategy | null;
 }
 
 export interface DashboardResponse {
@@ -1004,9 +1150,6 @@ export interface ValidationProblemDetails extends HttpValidationProblemDetails {
     errors: { [key: string]: string[]; };
 
     [key: string]: any;
-}
-
-export interface SuccessResult {
 }
 
 export interface UpdateProfileRequest {

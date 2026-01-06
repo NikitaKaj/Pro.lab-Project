@@ -1,11 +1,11 @@
 <template>
   <div class="flex h-screen">
-    <div class="w-1/2 bg-gray-50 flex flex-col items-center justify-center">
-      <div class="text-center">
+    <div class="w-1/2 bg-gray-50 flex items-center justify-center overflow-hidden">
+      <div class="w-full h-full">
         <img
           src="@/assets/images/RegistrationImage.jpg"
           alt="Delivery Illustration"
-          class="w-full h-full"
+          class="w-full h-full object-cover object-center"
         />
       </div>
     </div>
@@ -50,6 +50,9 @@
              {{ loading ? 'Processing...' : 'Login' }}
           </button>
         </form>
+        <div class="text-center !mt-4">
+        <text class="text-gray-500 text-sm">Login: admin<br>Password: admin</text>
+        </div>
       </div>
     </div>
   </div>

@@ -37,7 +37,7 @@ public class PlaceOrder : EndpointBaseAsync
             ctx.Orders.Add(order);
             await ctx.SaveChangesAsync();
 
-            return Ok();
+            return Ok(new { });
         }
         catch (Exception ex)
         {

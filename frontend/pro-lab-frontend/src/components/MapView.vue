@@ -12,6 +12,7 @@ type Props = {
   coordinates: CoordinateDto[];
   routeGeometry?: CoordinateDto[] | null;
   visitOrder?: number[] | null;
+  disabled?: boolean;
 };
 
 const props = defineProps<Props>();
@@ -34,6 +35,7 @@ function setCoordinates(next: CoordinateDto[]) {
 }
 
 function addPoint(lng: number, lat: number) {
+  if (props.disabled) return;
   setCoordinates([...props.coordinates, { longitude: lng, latitude: lat }]);
 }
 

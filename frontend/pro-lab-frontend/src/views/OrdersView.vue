@@ -2,7 +2,14 @@
 import Sidebar from '@/components/SideBar.vue'
 import PageHeader from '@/components/PageHeader.vue'
 import { ref, computed, onMounted } from 'vue'
-import { OrdersClient, OrderStatus, type GetOrderResponse } from '@/api-client/clients'
+import {
+  OrdersClient,
+  OrderStatus,
+  type GetOrderResponse,
+  type PlaceOrderRequest,
+  CouriersClient,
+  type CourierResponse,
+} from '@/api-client/clients'
 
 type OrderRow = {
   id: number
@@ -10,14 +17,23 @@ type OrderRow = {
   customer: string
   address: string
   status: OrderStatus
+  courierId?: number
+  courierName?: string
 }
 
 const baseUrl = import.meta.env.VITE_API_BASE_URL ?? 'https://localhost:5001'
 const ordersApi = new OrdersClient(baseUrl)
+const couriersApi = new CouriersClient(baseUrl)
 
 const items = ref<OrderRow[]>([])
 const loading = ref(false)
 const error = ref<string | null>(null)
+
+const couriers = ref<CourierResponse[]>([])
+const couriersLoading = ref(false)
+const couriersError = ref<string | null>(null)
+
+const submitting = ref(false)
 
 const currentPage = ref(1)
 const perPage = 10
@@ -68,6 +84,19 @@ async function loadOrders() {
   }
 }
 
+async function loadCouriers() {
+  couriersLoading.value = true
+  couriersError.value = null
+  try {
+    const data = await couriersApi.get()
+    couriers.value = data ?? []
+  } catch (e: any) {
+    couriersError.value = e?.message ?? 'Failed to load couriers'
+  } finally {
+    couriersLoading.value = false
+  }
+}
+
 async function deleteOrder(id: number) {
   try {
     await ordersApi.delete(id)
@@ -98,47 +127,66 @@ function statusLabel(s: OrderStatus) {
   }
 }
 
+function courierLabel(c: CourierResponse) {
+  return `${c.fullName} (#${c.courierId})`
+}
+
 const showAddModal = ref(false)
 
 const newOrder = ref({
   customer: '',
   address: '',
   status: OrderStatus.Pending as OrderStatus,
+  courierId: null as number | null,
 })
 
 function openAddModal() {
+  if (!couriersLoading.value && couriers.value.length === 0 && !couriersError.value) {
+    loadCouriers()
+  }
+
   newOrder.value = {
     customer: '',
     address: '',
     status: OrderStatus.Pending,
+    courierId: couriers.value[0]?.courierId ?? null,
   }
   showAddModal.value = true
 }
 
-function nextTempId() {
-  const maxId = items.value.reduce((m, x) => Math.max(m, x.id), 0)
-  return maxId + 1
-}
+async function addOrder() {
+  const customer = newOrder.value.customer.trim()
+  const address = newOrder.value.address.trim()
+  const courierId = newOrder.value.courierId
 
-function addOrderLocal() {
-  if (!newOrder.value.customer.trim() || !newOrder.value.address.trim()) return
+  if (!customer || !address) return
+  if (courierId == null) return
 
-  const now = new Date()
-  const row: OrderRow = {
-    id: nextTempId(),
-    created: now.toLocaleDateString('ru-RU'),
-    customer: newOrder.value.customer.trim(),
-    address: newOrder.value.address.trim(),
-    status: newOrder.value.status,
+  submitting.value = true
+  try {
+    const req: PlaceOrderRequest = {
+      customer,
+      address,
+      status: newOrder.value.status,
+      courierId,
+    }
+
+    await ordersApi.place(req)
+
+    showAddModal.value = false
+    currentPage.value = 1
+
+    await loadOrders()
+  } catch (e: any) {
+    alert(e?.message ?? 'Create order failed')
+  } finally {
+    submitting.value = false
   }
-
-  items.value = [row, ...items.value]
-  showAddModal.value = false
-
-  currentPage.value = 1
 }
 
-onMounted(loadOrders)
+onMounted(async () => {
+  await Promise.all([loadOrders(), loadCouriers()])
+})
 </script>
 
 <template>
@@ -262,13 +310,32 @@ onMounted(loadOrders)
 
     <div v-if="showAddModal" class="fixed inset-0 bg-black/30 flex justify-center items-center z-50">
       <div class="bg-white p-6 rounded-lg shadow-lg w-[420px]">
-        <h2 class="text-xl font-bold mb-4 text-center !mb-5">Add New Order</h2>
+        <h2 class="text-xl font-bold mb-4 text-center !mb-2">Add New Order</h2>
+
+        <div class="text-sm text-gray-600 mb-3">
+          <span v-if="couriersLoading">Loading couriers…</span>
+          <span v-else-if="couriersError" class="text-red-600">{{ couriersError }}</span>
+          <span v-else>&nbsp;</span>
+        </div>
+
+        <select
+          v-model="newOrder.courierId"
+          class="w-full border p-2 rounded mb-3 bg-white"
+          :disabled="couriersLoading || couriers.length === 0 || submitting"
+          style="margin-bottom: 10px;"
+        >
+          <option v-if="couriers.length === 0" :value="null">No couriers</option>
+          <option v-for="c in couriers" :key="c.courierId" :value="c.courierId">
+            {{ courierLabel(c) }}
+          </option>
+        </select>
 
         <input
           v-model="newOrder.customer"
           type="text"
           placeholder="Customer"
           class="w-full border p-2 rounded mb-3"
+          :disabled="submitting"
           style="margin-bottom: 10px;"
         />
 
@@ -277,10 +344,15 @@ onMounted(loadOrders)
           type="text"
           placeholder="Address"
           class="w-full border p-2 rounded mb-3"
+          :disabled="submitting"
           style="margin-bottom: 10px;"
         />
 
-        <select v-model="newOrder.status" class="w-full border p-2 rounded mb-4 bg-white">
+        <select
+          v-model="newOrder.status"
+          class="w-full border p-2 rounded mb-4 bg-white"
+          :disabled="submitting"
+        >
           <option :value="OrderStatus.Pending">Pending</option>
           <option :value="OrderStatus.InRoute">InRoute</option>
           <option :value="OrderStatus.Completed">Completed</option>
@@ -290,16 +362,18 @@ onMounted(loadOrders)
         <div class="flex justify-between !mt-5">
           <button
             @click="showAddModal = false"
-            class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+            :disabled="submitting"
+            class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 disabled:opacity-50"
           >
             Cancel
           </button>
 
           <button
-            @click="addOrderLocal"
-            class="px-4 py-2 bg-[#1673ea] text-white rounded hover:bg-[#105fc6]"
+            @click="addOrder"
+            :disabled="submitting || couriersLoading || couriers.length === 0 || newOrder.courierId == null"
+            class="px-4 py-2 bg-[#1673ea] text-white rounded hover:bg-[#105fc6] disabled:opacity-50"
           >
-            Add
+            {{ submitting ? 'Adding…' : 'Add' }}
           </button>
         </div>
       </div>

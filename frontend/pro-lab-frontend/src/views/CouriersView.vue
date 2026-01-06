@@ -4,7 +4,7 @@ import PageHeader from '@/components/PageHeader.vue'
 import { ref, computed, onMounted } from 'vue'
 import {
   CouriersClient,
-  type GetCourierResponse,
+  type CourierResponse,
   type CreateCourierRequest,
   type UpdateCourierRequest,
 } from '@/api-client/clients'
@@ -13,7 +13,8 @@ type CourierRow = {
   id: number
   created: string
   courier: string
-  shipped: number
+  completed: number
+  active: number
 }
 
 const baseUrl = import.meta.env.VITE_API_BASE_URL ?? 'https://localhost:5001'
@@ -48,22 +49,27 @@ function formatDateRu(value: Date | string | null | undefined) {
   return d.toLocaleDateString('ru-RU')
 }
 
-function toRow(c: GetCourierResponse): CourierRow {
+function toRow(c: CourierResponse): CourierRow {
   return {
     id: c.courierId,
     created: formatDateRu(c.createdAt),
     courier: c.fullName,
-    shipped: 0,
+    completed: c.completedOrdersCount ?? 0,
+    active: c.activeOrdersCount ?? 0,
   }
 }
 
 async function loadCouriers() {
   loading.value = true
   error.value = null
+
   try {
     const data = await couriersApi.get()
     items.value = (data ?? []).map(toRow)
-    if (currentPage.value > totalPages.value) currentPage.value = Math.max(1, totalPages.value)
+
+    if (currentPage.value > totalPages.value) {
+      currentPage.value = Math.max(1, totalPages.value)
+    }
   } catch (e: any) {
     error.value = e?.message ?? 'Failed to load couriers'
   } finally {
@@ -75,7 +81,10 @@ async function deleteCourier(id: number) {
   try {
     await couriersApi.delete(id)
     items.value = items.value.filter(x => x.id !== id)
-    if (currentPage.value > totalPages.value) currentPage.value = Math.max(1, totalPages.value)
+
+    if (currentPage.value > totalPages.value) {
+      currentPage.value = Math.max(1, totalPages.value)
+    }
   } catch (e: any) {
     alert(e?.message ?? 'Delete failed')
   }
@@ -86,11 +95,11 @@ const showEditModal = ref(false)
 const editId = ref<number | null>(null)
 
 const form = ref({
-  courier: ''
+  courier: '',
 })
 
 function openAddModal() {
-  form.value = { courier: ''}
+  form.value = { courier: '' }
   showAddModal.value = true
 }
 
@@ -111,12 +120,13 @@ async function addCourier() {
 
 function openEditModal(row: CourierRow) {
   editId.value = row.id
-  form.value = { courier: row.courier}
+  form.value = { courier: row.courier }
   showEditModal.value = true
 }
 
 async function saveEditedCourier() {
-  if (!editId.value) return
+  if (editId.value == null) return
+
   const name = form.value.courier.trim()
   if (!name) return
 
@@ -170,17 +180,18 @@ onMounted(loadCouriers)
         <table class="table-fixed border-2 w-[90%] bg-white">
           <thead class="border-2 font-bold">
             <tr>
-              <th class="border p-3 w-[15%]">ID</th>
-              <th class="border w-[20%]">Created</th>
+              <th class="border p-3 w-[12%]">ID</th>
+              <th class="border w-[18%]">Created</th>
               <th class="border w-[35%]">Courier</th>
-              <th class="border w-[20%]">Shipped (overall)</th>
+              <th class="border w-[15%]">Completed</th>
+              <th class="border w-[10%]">Active</th>
               <th class="border w-[10%]">Actions</th>
             </tr>
           </thead>
 
           <tbody>
             <tr v-if="!loading && paginatedItems.length === 0">
-              <td class="border p-6 text-center text-gray-500" colspan="5">
+              <td class="border p-6 text-center text-gray-500" colspan="6">
                 No couriers yet
               </td>
             </tr>
@@ -194,7 +205,8 @@ onMounted(loadCouriers)
               <td class="border p-3">#{{ row.id }}</td>
               <td class="border">{{ row.created }}</td>
               <td class="border">{{ row.courier }}</td>
-              <td class="border">{{ row.shipped }}</td>
+              <td class="border">{{ row.completed }}</td>
+              <td class="border">{{ row.active }}</td>
 
               <td class="border p-3">
                 <div class="flex items-center justify-center gap-6 cursor-pointer">
@@ -216,7 +228,6 @@ onMounted(loadCouriers)
           </tbody>
         </table>
       </div>
-
 
       <div class="flex justify-end pr-[80px] pt-[14px] items-center">
         <span style="margin-right: 14px;">
@@ -247,10 +258,9 @@ onMounted(loadCouriers)
       </div>
     </div>
 
-
     <div v-if="showAddModal" class="fixed inset-0 bg-black/30 flex justify-center items-center z-50">
       <div class="bg-white p-6 rounded-lg shadow-lg w-[400px]">
-        <h2 class="text-xl font-bold mb-4 text-center">Add Courier</h2>
+        <h2 class="text-xl font-bold mb-4 text-center !mb-2">Add Courier</h2>
 
         <input
           v-model="form.courier"
@@ -260,7 +270,7 @@ onMounted(loadCouriers)
           style="margin-bottom: 10px;"
         />
 
-        <div class="flex justify-between">
+        <div class="flex justify-between !mt-2">
           <button
             @click="showAddModal = false"
             class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"

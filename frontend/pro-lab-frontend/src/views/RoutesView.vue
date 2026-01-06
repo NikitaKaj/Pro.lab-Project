@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, ref, onMounted, watch } from "vue";
 import Sidebar from "@/components/SideBar.vue";
 import MapView from "@/components/MapView.vue";
 import PageHeader from "@/components/PageHeader.vue";
@@ -10,26 +10,72 @@ import {
   SelectionStrategy,
   OptimizationAlgorithm,
   type OptimizeRouteRequest,
+  CouriersClient,
+  type CourierResponse,
 } from "@/api-client/clients";
 
-const selectedCoordinates = ref<CoordinateDto[]>([]);
 
+const selectedCoordinates = ref<CoordinateDto[]>([]);
 const startIndex = ref(0);
 
 const selectionStrategy = ref<SelectionStrategy>(SelectionStrategy.Balanced);
-
 const algorithm = ref<OptimizationAlgorithm>(OptimizationAlgorithm.WithAlternatives);
 
 const optimizeResult = ref<any>(null);
 const loading = ref(false);
 const errorText = ref<string | null>(null);
 
-const canOptimize = computed(() => selectedCoordinates.value.length >= 2);
 
-const routesClient = new RoutesClient(import.meta.env.VITE_API_BASE_URL ?? "https://localhost:5001");
+const baseUrl = import.meta.env.VITE_API_BASE_URL ?? "https://localhost:5001";
+const routesClient = new RoutesClient(baseUrl);
+const couriersClient = new CouriersClient(baseUrl);
 
-async function generateOptimalRoute() {
-  if (!canOptimize.value) return;
+
+const couriers = ref<CourierResponse[]>([]);
+const couriersLoading = ref(false);
+const couriersError = ref<string | null>(null);
+
+const selectedCourierId = ref<number | null>(null);
+
+
+const eligibleCouriers = computed(() =>
+  (couriers.value ?? []).filter((c) => (c.activeOrdersCount ?? 0) > 1)
+);
+
+function courierLabel(c: CourierResponse) {
+  return `${c.fullName} (#${c.courierId}) — active: ${c.activeOrdersCount}`;
+}
+
+async function loadCouriers() {
+  couriersLoading.value = true;
+  couriersError.value = null;
+  try {
+    const data = await couriersClient.get();
+    couriers.value = data ?? [];
+  } catch (e: any) {
+    couriersError.value = e?.message ?? "Failed to load couriers";
+  } finally {
+    couriersLoading.value = false;
+  }
+}
+
+const canOptimize = computed(() => {
+  if (selectedCourierId.value != null) return true;
+  return selectedCoordinates.value.length >= 2;
+});
+
+watch(selectedCourierId, (id) => {
+  errorText.value = null;
+  optimizeResult.value = null;
+
+  if (id != null) {
+    selectedCoordinates.value = [];
+    startIndex.value = 0;
+  }
+});
+
+async function generateRouteManual() {
+  if (selectedCoordinates.value.length < 2) return;
 
   loading.value = true;
   errorText.value = null;
@@ -46,14 +92,39 @@ async function generateOptimalRoute() {
     const res = await routesClient.login(request);
     optimizeResult.value = res;
   } catch (e: any) {
-    errorText.value =
-      e?.detail ??
-      e?.title ??
-      e?.message ??
-      JSON.stringify(e);
+    errorText.value = e?.detail ?? e?.title ?? e?.message ?? JSON.stringify(e);
   } finally {
     loading.value = false;
   }
+}
+
+async function generateRouteByCourier() {
+  if (selectedCourierId.value == null) return;
+
+  loading.value = true;
+  errorText.value = null;
+  optimizeResult.value = null;
+
+  try {
+    const res = await routesClient.getRoute({
+      courierId: selectedCourierId.value,
+      algorithm: algorithm.value,
+      selectionStrategy: selectionStrategy.value,
+    });
+    optimizeResult.value = res;
+
+    selectedCoordinates.value = [];
+    startIndex.value = 0;
+  } catch (e: any) {
+    errorText.value = e?.detail ?? e?.title ?? e?.message ?? JSON.stringify(e);
+  } finally {
+    loading.value = false;
+  }
+}
+
+async function generateOptimalRoute() {
+  if (selectedCourierId.value != null) return generateRouteByCourier();
+  return generateRouteManual();
 }
 
 function clearPoints() {
@@ -62,6 +133,10 @@ function clearPoints() {
   optimizeResult.value = null;
   errorText.value = null;
 }
+
+onMounted(async () => {
+  await loadCouriers();
+});
 </script>
 
 <template>
@@ -91,36 +166,88 @@ function clearPoints() {
       </div>
 
       <div class="flex gap-6">
-        <div class="w-2/3 bg-white rounded-lg border border-gray-200 shadow-sm h-[600px] flex items-center justify-center">
+        <div
+          class="w-2/3 bg-white rounded-lg border border-gray-200 shadow-sm h-[600px] flex items-center justify-center"
+        >
           <MapView
             v-model:coordinates="selectedCoordinates"
             :route-geometry="optimizeResult?.fullGeometry ?? null"
             :visit-order="optimizeResult?.visitOrder ?? null"
+            :disabled="selectedCourierId !== null"
           />
         </div>
 
         <div class="w-1/3 bg-white rounded-lg border border-gray-200 shadow-sm p-4">
+          <h2 class="text-lg text-black font-semibold mb-2">Route mode</h2>
+
+          <div class="text-sm text-gray-600 !mb-4">
+            <div class="mb-2">
+              <span class="font-medium">Manual points:</span>
+              pick points on map (need 2+), then generate.
+            </div>
+            <div>
+              <span class="font-medium">Courier mode:</span>
+              pick courier (with &gt; 1 active order)
+            </div>
+          </div>
+
+          <!-- <div class="ml-auto width-full flex justify-end">
+            <button
+              class="border border-gray-300 text-gray-700 font-semibold px-4 py-2 rounded-md bg-white hover:bg-gray-100 transition"
+              @click="loadCouriers"
+              :disabled="couriersLoading"
+            >
+              Refresh couriers
+            </button>
+          </div> -->
+
+          <div class="mb-4">
+            <label class="text-sm text-gray-700 font-medium">Courier (optional)</label>
+
+            <select
+              class="w-full border border-gray-200 rounded-md px-3 py-2 bg-white disabled:opacity-60"
+              v-model="selectedCourierId"
+              :disabled="couriersLoading"
+            >
+              <option :value="null">
+                Manual points (no courier)
+              </option>
+
+              <option v-if="eligibleCouriers.length === 0" :value="null" disabled>
+                No couriers with &gt; 1 active order
+              </option>
+
+              <option
+                v-for="c in eligibleCouriers"
+                :key="c.courierId"
+                :value="c.courierId"
+              >
+                {{ courierLabel(c) }}
+              </option>
+            </select>
+            <div class="mt-1 text-xs text-gray-600">
+              <span v-if="couriersLoading">Loading couriers…</span>
+              <span v-else-if="couriersError" class="text-red-600">{{ couriersError }}</span>
+              <span v-else>&nbsp;</span>
+            </div>
+          </div>
+
           <h2 class="text-lg text-black font-semibold mb-2">Selected points</h2>
-          <p class="text-sm text-gray-600 mb-4">
-            Click on map to add. Click marker to remove. Drag to adjust.
+          <p class="text-sm text-gray-600 !mb-4">
+            <span v-if="selectedCourierId != null">
+              Courier selected, manual point selection disabled.
+            </span>
+            <span v-else>
+              Click on map to add. Click marker to remove. Drag to adjust.
+            </span>
           </p>
 
           <div class="mb-4">
-            <label class="text-sm text-gray-700 font-medium">Start index</label>
+            <label class="text-sm text-gray-700 font-medium">Selection strategy</label>
             <select
               class="mt-1 w-full border border-gray-200 rounded-md px-3 py-2"
-              v-model.number="startIndex"
-              :disabled="selectedCoordinates.length === 0"
+              v-model.number="selectionStrategy"
             >
-              <option v-for="(_, idx) in selectedCoordinates" :key="idx" :value="idx">
-                {{ idx }} ({{ selectedCoordinates[idx].longitude.toFixed(5) }}, {{ selectedCoordinates[idx].latitude.toFixed(5) }})
-              </option>
-            </select>
-          </div>
-
-          <div class="mb-4">
-            <label class="text-sm text-gray-700 font-medium">Selection strategy</label>
-            <select class="mt-1 w-full border border-gray-200 rounded-md px-3 py-2" v-model.number="selectionStrategy">
               <option :value="SelectionStrategy.Fastest">Fastest</option>
               <option :value="SelectionStrategy.Shortest">Shortest</option>
               <option :value="SelectionStrategy.Balanced">Balanced</option>
@@ -131,7 +258,10 @@ function clearPoints() {
 
           <div class="mb-6">
             <label class="text-sm text-gray-700 font-medium">Algorithm</label>
-            <select class="mt-1 w-full border border-gray-200 rounded-md px-3 py-2" v-model.number="algorithm">
+            <select
+              class="mt-1 w-full border border-gray-200 rounded-md px-3 py-2"
+              v-model.number="algorithm"
+            >
               <option :value="OptimizationAlgorithm.NearestNeighbor">NearestNeighbor</option>
               <option :value="OptimizationAlgorithm.WithAlternatives">WithAlternatives</option>
             </select>
@@ -141,12 +271,18 @@ function clearPoints() {
             {{ errorText }}
           </div>
 
-          <!-- <div v-if="optimizeResult" class="mt-4">
-            <h3 class="text-md text-black font-semibold mb-2">Result</h3>
-            <pre class="text-xs bg-gray-50 border border-gray-200 rounded-md p-3 overflow-auto max-h-[220px]">
-              {{ JSON.stringify(optimizeResult, null, 2) }}
-            </pre>
-          </div> -->
+          <div class="mt-4 text-xs text-gray-600 !mt-5">
+            <div>
+              Manual points selected:
+              <span class="font-semibold">{{ selectedCoordinates.length }}</span>
+            </div>
+            <div>
+              Mode:
+              <span class="font-semibold">
+                {{ selectedCourierId != null ? "Courier mode" : "Manual mode" }}
+              </span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
