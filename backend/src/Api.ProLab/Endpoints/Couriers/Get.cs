@@ -29,7 +29,7 @@ public class GetCourier : EndpointBaseAsync
                 {
                     CourierId = c.Id,
                     FullName = c.FullName,
-                    CompletedOrdersCount = ctx.Orders.Count(o => o.CourierId == c.Id),
+                    CompletedOrdersCount = ctx.Orders.Count(o => o.CourierId == c.Id && o.Status == Data.Enums.OrderStatus.Completed),
                     CreatedAt = c.CreatedAt,
                     ActiveOrdersCount = ctx.Orders.Count(o => o.CourierId == c.Id && o.Status == Data.Enums.OrderStatus.Pending),
                 })
