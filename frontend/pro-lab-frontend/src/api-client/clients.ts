@@ -22,7 +22,7 @@ export class CouriersClient extends ClientsBase {
 
         this.instance = instance || axios.create();
 
-        this.baseUrl = baseUrl ?? "https://localhost:5001";
+        this.baseUrl = baseUrl ?? "https://prolab.azurewebsites.net";
 
     }
 
