@@ -270,7 +270,7 @@ export class OrdersClient extends ClientsBase {
 
         this.instance = instance || axios.create();
 
-        this.baseUrl = baseUrl ?? "https://localhost:5001";
+        this.baseUrl = baseUrl ?? "https://prolab.azurewebsites.net";
 
     }
 
@@ -522,7 +522,7 @@ export class RoutesClient extends ClientsBase {
 
         this.instance = instance || axios.create();
 
-        this.baseUrl = baseUrl ?? "https://localhost:5001";
+        this.baseUrl = baseUrl ?? "https://prolab.azurewebsites.net";
 
     }
 
@@ -667,7 +667,7 @@ export class DashboardClient extends ClientsBase {
 
         this.instance = instance || axios.create();
 
-        this.baseUrl = baseUrl ?? "https://localhost:5001";
+        this.baseUrl = baseUrl ?? "https://prolab.azurewebsites.net";
 
     }
 
@@ -733,7 +733,7 @@ export class AccountsClient extends ClientsBase {
 
         this.instance = instance || axios.create();
 
-        this.baseUrl = baseUrl ?? "https://localhost:5001";
+        this.baseUrl = baseUrl ?? "https://prolab.azurewebsites.net";
 
     }
 

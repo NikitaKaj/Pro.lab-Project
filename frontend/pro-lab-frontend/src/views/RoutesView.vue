@@ -28,7 +28,7 @@ const optimizeResult = ref<any>(null);
 const loading = ref(false);
 const errorText = ref<string | null>(null);
 
-const baseUrl = import.meta.env.VITE_API_BASE_URL ?? "https://localhost:5001";
+const baseUrl = import.meta.env.VITE_API_BASE_URL ?? "https://prolab.azurewebsites.net";
 const routesClient = new RoutesClient(baseUrl);
 const couriersClient = new CouriersClient(baseUrl);
 

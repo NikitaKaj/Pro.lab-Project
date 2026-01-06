@@ -21,7 +21,7 @@ type CourierRow = {
   active: number
 }
 
-const baseUrl = import.meta.env.VITE_API_BASE_URL ?? 'https://localhost:5001'
+const baseUrl = import.meta.env.VITE_API_BASE_URL ?? 'https://prolab.azurewebsites.net'
 const couriersApi = new CouriersClient(baseUrl)
 
 const items = ref<CourierRow[]>([])

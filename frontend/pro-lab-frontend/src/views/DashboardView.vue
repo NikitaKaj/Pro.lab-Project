@@ -11,7 +11,7 @@ import { OrdersClient, OrderStatus, type GetOrderResponse } from '@/api-client/c
 
 const sidebarOpen = ref(false)
 
-const baseUrl = import.meta.env.VITE_API_BASE_URL ?? 'https://localhost:5001'
+const baseUrl = import.meta.env.VITE_API_BASE_URL ?? 'https://prolab.azurewebsites.net'
 const ordersApi = new OrdersClient(baseUrl)
 
 const loading = ref(false)
