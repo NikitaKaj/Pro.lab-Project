@@ -201,7 +201,7 @@ onMounted(async () => {
         <div class="w-full lg:w-1/3 bg-white rounded-lg border border-gray-200 shadow-sm p-4">
           <h2 class="text-lg text-black font-semibold mb-2">Route mode</h2>
 
-          <div class="text-sm text-gray-600 mb-4">
+          <div class="text-sm text-gray-600 !mb-2">
             <div class="mb-2">
               <span class="font-medium">Manual points:</span>
               pick points on map (need 2+), then generate.
@@ -243,7 +243,7 @@ onMounted(async () => {
           </div>
 
           <h2 class="text-lg text-black font-semibold mb-2">Selected points</h2>
-          <p class="text-sm text-gray-600 mb-4">
+          <p class="text-sm text-gray-600 !mb-4">
             <span v-if="selectedCourierId != null">
               Courier selected, manual point selection disabled.
             </span>
@@ -252,7 +252,7 @@ onMounted(async () => {
             </span>
           </p>
 
-          <div class="mb-4">
+          <div class="">
             <label class="text-sm text-gray-700 font-medium">Selection strategy</label>
             <select
               class="mt-1 w-full border border-gray-200 rounded-md px-3 py-2"
@@ -266,7 +266,7 @@ onMounted(async () => {
             </select>
           </div>
 
-          <div class="mb-6">
+          <div class="">
             <label class="text-sm text-gray-700 font-medium">Algorithm</label>
             <select
               class="mt-1 w-full border border-gray-200 rounded-md px-3 py-2"
@@ -281,7 +281,7 @@ onMounted(async () => {
             {{ errorText }}
           </div>
 
-          <div class="mt-4 text-xs text-gray-600">
+          <div class="!mt-4 text-xs text-gray-600">
             <div>
               Manual points selected:
               <span class="font-semibold">{{ selectedCoordinates.length }}</span>

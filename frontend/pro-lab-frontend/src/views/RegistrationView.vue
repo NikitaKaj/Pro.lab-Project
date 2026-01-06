@@ -45,14 +45,14 @@
 
           <button
             type="submit"
-            class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition mt-4 disabled:opacity-70"
+            class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition !mt-4 disabled:opacity-70"
             :disabled="loading"
           >
             {{ loading ? 'Processing...' : 'Login' }}
           </button>
         </form>
 
-        <div class="text-center mt-4">
+        <div class="text-center !mt-4">
           <text class="text-gray-500 text-sm">Login: admin<br />Password: admin</text>
         </div>
       </div>

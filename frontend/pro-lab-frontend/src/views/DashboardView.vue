@@ -140,7 +140,7 @@ onMounted(async () => {
           ]"
         />
 
-        <div class="mt-6 grid gap-6">
+        <div class="!mt-6 grid gap-6">
           <OrdersChart
             class="rounded-lg border border-gray-200 shadow-sm"
             :labels="labels"
