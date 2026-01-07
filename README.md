@@ -66,10 +66,10 @@ Katrs Transports tiek izmantots vairākos Maršrutos (1:N).<br>
 
 # Novērtējums
 ### Novērtēšanas plāns
-Eksperimenta mērķis ir novērtēt maršrutu plānošanas algoritma veiktspēju un efektivitāti, mainot galvenos sistēmas darbības parametrus – pieejamo kurjeru skaitu, kurjeru maiņas ilgumu un vidējo apkalpošanas laiku pie klienta. Šāda pieeja ļauj novērtēt sistēmas uzvedību dažādos darba scenārijos un noteikt optimālus konfigurācijas parametrus.
+Risinājuma novērtēšanas mērķis ir pārbaudīt izstrādātās sistēmas un maršrutu plānošanas algoritma spēju efektīvi sadalīt piegādes starp kurjeriem dažādos darba apstākļos. Novērtēšana balstās uz eksperimentālu pieeju, kurā tiek mainīti galvenie sistēmas darbības parametri, analizējot to ietekmi uz algoritma veiktspēju un resursu izmantošanas efektivitāti.
+Eksperimenta ietvaros tiek analizēta sistēmas uzvedība pie dažāda pieejamo kurjeru skaita, maiņas ilguma un vidējā apkalpošanas laika pie klienta. Šāda pieeja ļauj novērtēt risinājuma piemērotību praktiskai izmantošanai loģistikas un piegādes sistēmās.
 
 #### Eksperimenta mērķis
-
 Novērtēt maršrutu plānošanas algoritma efektivitāti, analizējot tā darbību pie dažāda pieejamo kurjeru skaita, kurjeru maiņas ilguma un vidējā klienta apkalpošanas laika, lai nodrošinātu optimālu piegāžu sadali starp kurjeriem.
 
 #### Ieejas parametri
@@ -80,12 +80,14 @@ Novērtēt maršrutu plānošanas algoritma efektivitāti, analizējot tā darb�
 
 #### Novērtēšanas mēri
 
-- **Maršrutu plānošanas laiks (W, s)** – algoritma izpildes laiks, lai izveidotu maršrutus visiem kurjeriem.
-- **Vidējais kurjeru noslogojums (U, %)** – kurjeru faktiskā darba laika attiecība pret pieejamo maiņas laiku (cik efektīvi tiek izmantoti kurjeri).
+- **Maršrutu plānošanas laiks (W, s)** – laiks, kas nepieciešams algoritmam, lai izveidotu maršrutus visiem kurjeriem.
+- **Vidējais kurjeru noslogojums (U, %)** – kurjeru faktiskā darba laika attiecība pret kopējo pieejamo maiņas laiku.
 
 #### Eksperimentu plāns
 
-Eksperimentu plāns tika izstrādāts, sistemātiski kombinējot trīs galvenos ieejas parametrus: kurjeru skaitu (K), maiņas ilgumu (MI) un vidējo apkalpošanas laiku pie klienta (VPT). Katrs eksperiments atbilst atšķirīgam darba scenārijam, kas ļauj analizēt maršrutu plānošanas algoritma uzvedību gan pie zemākas, gan pie augstākas sistēmas noslodzes. Šāda pieeja nodrošina salīdzināmus rezultātus un ļauj identificēt parametru ietekmi uz maršrutu plānošanas laiku un kurjeru noslogojumu.
+Eksperimentu plāns tika izveidots, sistemātiski kombinējot ieejas parametru vērtības. Katrs eksperiments raksturo atšķirīgu sistēmas noslodzes scenāriju – no situācijām ar nelielu kurjeru skaitu un augstu noslogojumu līdz scenārijiem ar lielāku kurjeru skaitu un lielāku sistēmas elastību. Šāda struktūra nodrošina iespēju salīdzināt rezultātus un identificēt galvenās parametru ietekmes uz algoritma darbību.
+
+Eksperimentu rezultāti maršrutu plānošanas algoritma novērtēšanai tabula:
 
 | Nr. | K | MI (h) | VPT (min) | W (s) | U (%) |
 |----:|--:|-------:|----------:|------:|------:|
@@ -106,10 +108,14 @@ Eksperimentu plāns tika izstrādāts, sistemātiski kombinējot trīs galvenos 
 | 15  | 6 | 8      | 10        | 3.8   | 61    |
 | 16  | 8 | 8      | 10        | 4.7   | 53    |
 
+Tabulā apkopoti eksperimentu rezultāti, kuros tika mainīti galvenie sistēmas ieejas parametri
+kurjeru skaits, maiņas ilgums un vidējais apkalpošanas laiks pie klienta. 
+Katrs eksperiments raksturo atšķirīgu sistēmas noslodzes scenāriju, 
+bet rādītāji W un U atspoguļo algoritma veiktspēju un kurjeru noslogojuma efektivitāti.
+
 ### Novērtēšanas rezultāti
-Eksperimentu rezultāti parāda skaidras sakarības starp ieejas parametriem un maršrutu plānošanas algoritma darbības rādītājiem. Palielinoties pieejamo kurjeru skaitam (K), maršrutu plānošanas laiks (W) pakāpeniski pieaug, jo algoritmam nepieciešams apstrādāt lielāku iespējamo piegāžu sadales variantu skaitu. Tomēr visos eksperimentu scenārijos algoritma izpildes laiks saglabājas dažu sekunžu robežās, kas norāda uz labu veiktspēju un praktisku pielietojamību.
-Vidējais kurjeru noslogojums (U) samazinās, pieaugot kurjeru skaitam, jo pie nemainīga pasūtījumu apjoma darbs tiek sadalīts uz lielāku kurjeru skaitu. Tas īpaši izteikti novērojams scenārijos ar K = 8, kur noslogojums samazinās līdz aptuveni 42–62%, salīdzinot ar scenārijiem, kuros pieejami tikai 2 kurjeri.
-Vidējais apkalpošanas laiks pie klienta (VPT) būtiski ietekmē kurjeru noslogojumu. Pie VPT = 10 min noslogojums ir ievērojami augstāks nekā pie VPT = 5 min, jo katra piegāde aizņem lielāku daļu no kurjera pieejamā darba laika. Tas norāda, ka algoritma efektivitāte ir cieši saistīta ne tikai ar maršruta ģeogrāfiju, bet arī ar operacionālajiem procesiem pie klienta.
-Maiņas ilguma palielināšana no 6 līdz 8 stundām samazina relatīvo kurjeru noslogojumu, jo pieaug pieejamais darba laiks. Šāds risinājums var būt piemērots situācijās, kad svarīgi nodrošināt rezervi pīķa noslodzes gadījumiem, tomēr tas var radīt arī resursu neizmantotību pie zemāka pasūtījumu apjoma.
+Eksperimentu rezultāti parāda, ka izstrādātais maršrutu plānošanas algoritms korekti reaģē uz izmaiņām sistēmas konfigurācijā. Palielinoties kurjeru skaitam, pieaug maršrutu plānošanas laiks, tomēr tas visos gadījumos saglabājas dažu sekunžu robežās, kas norāda uz algoritma labu veiktspēju un piemērotību praktiskai lietošanai.
+Vidējais kurjeru noslogojums samazinās, pieaugot kurjeru skaitam, jo piegādes tiek sadalītas uz lielāku izpildītāju skaitu. Savukārt, pie ilgāka apkalpošanas laika pie klienta, kurjeru noslogojums palielinās, jo katrs pasūtījums aizņem lielāku daļu no pieejamā darba laika.
+Maiņas ilguma palielināšana nodrošina papildu elastību maršrutu plānošanā, taču pie nemainīga pasūtījumu apjoma var novest pie zemāka relatīvā noslogojuma. Tas norāda uz nepieciešamību pielāgot sistēmas konfigurāciju atbilstoši faktiskajam pieprasījumam.
 
 # Secinājumi
