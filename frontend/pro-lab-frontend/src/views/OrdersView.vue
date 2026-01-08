@@ -236,7 +236,7 @@ onMounted(async () => {
       </div>
 
       <div class="flex justify-center !mt-5">
-        <table class="table-fixed border-2 w-[90%] bg-white">
+        <table class="hidden md:table table-fixed border-2 w-[90%] bg-white">
           <thead class="border-2 font-bold">
             <tr>
               <th class="border p-3 w-[10%]">ID</th>
@@ -292,6 +292,77 @@ onMounted(async () => {
             </tr>
           </tbody>
         </table>
+
+        <!-- MOBILE CARDS (<md) -->
+        <div class="md:hidden w-[90%]">
+          <div v-if="!loading && paginatedItems.length === 0" class="border-2 bg-white p-6 text-center text-gray-500">
+            No orders yet
+          </div>
+
+          <div v-else class="flex flex-col gap-3">
+            <div
+              v-for="order in paginatedItems"
+              :key="order.id"
+              class="border-2 bg-white"
+            >
+              <!-- Row 1 -->
+              <div class="grid grid-cols-2 border-b">
+                <div class="border-r p-3 text-xs font-bold text-gray-700">ID</div>
+                <div class="p-3 text-sm text-right">#{{ order.id }}</div>
+              </div>
+
+              <!-- Row 2 -->
+              <div class="grid grid-cols-2 border-b">
+                <div class="border-r p-3 text-xs font-bold text-gray-700">Created</div>
+                <div class="p-3 text-sm text-right">{{ order.created }}</div>
+              </div>
+
+              <!-- Row 3 -->
+              <div class="grid grid-cols-2 border-b">
+                <div class="border-r p-3 text-xs font-bold text-gray-700">Customer</div>
+                <div class="p-3 text-sm text-right break-words">{{ order.customer }}</div>
+              </div>
+
+              <!-- Row 4 -->
+              <div class="grid grid-cols-2 border-b">
+                <div class="border-r p-3 text-xs font-bold text-gray-700">Address</div>
+                <div class="p-3 text-sm text-right break-words">{{ order.address }}</div>
+              </div>
+
+              <!-- Row 5 -->
+              <div class="grid grid-cols-2 border-b">
+                <div class="border-r p-3 text-xs font-bold text-gray-700">Status</div>
+                <div class="p-3 flex justify-end">
+                  <select
+                    class="border rounded px-2 py-1 bg-white w-full max-w-[220px]"
+                    :value="order.status"
+                    @change="setStatus(order.id, Number(($event.target as HTMLSelectElement).value) as any)"
+                  >
+                    <option :value="OrderStatus.Pending">{{ statusLabel(OrderStatus.Pending) }}</option>
+                    <option :value="OrderStatus.InRoute">{{ statusLabel(OrderStatus.InRoute) }}</option>
+                    <option :value="OrderStatus.Completed">{{ statusLabel(OrderStatus.Completed) }}</option>
+                    <option :value="OrderStatus.Cancelled">{{ statusLabel(OrderStatus.Cancelled) }}</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Actions -->
+              <div class="grid grid-cols-2">
+                <div class="border-r p-3 text-xs font-bold text-gray-700">Actions</div>
+                <div class="p-3 flex justify-end">
+                  <div class="flex items-center gap-6 cursor-pointer">
+                    <img
+                      src="@/assets/images/DeleteUser.png"
+                      class="w-6"
+                      @click="deleteOrder(order.id)"
+                      title="Delete"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="flex justify-end pr-[80px] pt-[14px] items-center">
