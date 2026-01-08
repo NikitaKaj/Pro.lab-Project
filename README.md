@@ -6,13 +6,11 @@ Maršruta optimizācija ir galvenais mērķis loģistikas un piegādes sistēmā
 | Nr.   | Lietotāju stāsts <lietotājs> vēlas <sasniegt mērķi>, jo <ieguvums>   | Prioritāte |
 |--------------|----------------|--------------------|
 |1|Klients vēlas ātru pasūtījuma piegādi, jo tas ir ērti|1
-|2|Klients vēlas pats izvēlēties piegādes laiku, jo tas padara pakalpojumu vairāk orientētu uz klientu|2
-|3|Uzņēmums vēlas apmierināt klientus, jo tas palielinās viņu reitingu un atpazīstamību|6
-|4|Uzņēmums vēlas optimizēt maršrutu, jo tas palīdzēs samazināt degvielas izmaksas|3
-|5|Kurjers vēlas ērtu navigācijas sistēmu, jo tā samazinās pasūtījuma izpildes laiku|4
-|6|Kurjers vēlas zināt laika logus, jo tas optimizē viņa darbu|5
+|2|Uzņēmums vēlas apmierināt klientus, jo tas palielinās viņu reitingu un atpazīstamību|6
+|3|Uzņēmums vēlas optimizēt maršrutu, jo tas palīdzēs samazināt degvielas izmaksas|3
+|4|Kurjers vēlas ērtu navigācijas sistēmu, jo tā samazinās pasūtījuma izpildes laiku|4
 ### Mērķis 
-Izstrādāt sistēmu, kas optimizē piegādes maršrutus, ņemot vērā dažādus faktorus, tostarp klienta ģeogrāfisko atrašanās vietu, izvēlēto laika logu un pieejamo kurjeru skaitu, kā arī citu loģistikai svarīgu informāciju.
+Izstrādāt sistēmu, kas optimizē piegādes maršrutus, ņemot vērā dažādus faktorus, tostarp klienta ģeogrāfisko atrašanās vietu un pieejamo kurjeru skaitu, kā arī citu loģistikai svarīgu informāciju.
 ### Uzdevumi 
 #### 1. Analizēt problēmu un izvirzīt mērķi.
 #### 2. Izpētīt esošos līdzīgos risinājumus.
@@ -35,7 +33,59 @@ Route4Me|Maršruta optimizācijas platforma, kas paredzēta uzņēmumiem un priv
 # Tehniskais risinājums
 
 ## Prasības
+### Funkcionālās prasības
+#### 1. Sistēmai jāspēj iegūt pasūtījumus no datubāzes pēc kurjera ID.
+#### 2. Katram pasūtījumam jābūt saglabātai klienta informācijai (vārds, adrese).
+#### 3. Sistēmai jāspēj geokodēt Latvijas adreses (teksts → koordinātas).
+#### 4. Sistēmai jāapstrādā kļūdas, ja adrese nav atrodama.
+#### 5. Sistēmai jāatbalsta adreses formātā "Iela Numurs, Pilsēta".
+#### 6. Sistēmai jāspēj optimizēt maršrutu vismaz 2 punktiem.
+#### 7. Sistēmai jāatgriež optimālu apmeklēšanas secību.
+#### 8. Sistēmai jāvalidē ievaddati (minimālais punktu skaits, adrešu esamība).
+#### 9. Sistēmai jāatgriež informatīvus kļūdu paziņojumus latviešu valodā.
+#### 10. Lietotājam jābūt iespējai apskatīt rezultātus grafiskā veidā.
+
+### Nefunkcionālās prasības
+#### 1. Sistēmai jādarbojas 99% laika (pieļaujama Mapbox API kļūda).
+#### 2. Kļūdu ziņojumiem jābūt latviešu valodā.
+#### 3. HTTP statusa kodi jāievēro REST standartam.
+#### 4. API endpoints jādokumentē ar Swagger/OpenAPI.
+
 ## Algoritms
+    BEGIN PROGRAM
+    Inicializēt servisi (Mapbox, Datubāze, Optimizācija)
+
+    Iegūt kurjera pasūtījumus no datubāzes
+
+    Pārbaudīt validitāti:
+        IF pasūtījumu nav THEN
+            RETURN
+        IF pasūtījumu < 2 THEN
+            RETURN
+        IF kādam pasūtījumam nav adreses THEN
+            RETURN
+
+    Geokodēt adreses:
+        FOR katrs pasūtījums DO
+            koordināta = Mapbox.GeocodeAddress(adrese, "LV")
+            IF koordināta == NULL THEN
+                Pievienot kļūdu sarakstam
+            ELSE
+                Pievienot koordinātu sarakstam
+        END FOR
+
+    IF ir geokodēšanas kļūdas THEN
+        RETURN BadRequest ar kļūdu detaļām
+
+    Optimizēt maršrutu:
+        IF algorithm == NearestNeighbor THEN
+            Iegūt attālumu matricu no Mapbox
+            Aprēķināt optimālo secību ar NN algoritmu
+        ELSE IF algorithm == WithAlternatives THEN
+            Soli pa solim izvēlēties labākos maršrutus
+        END IF
+    END PROGRAM
+
 ## Konceptu modelis
 ![Link Error](https://i.ibb.co/rGXDfm6q/image.png)
 ### Klients: 
@@ -119,3 +169,10 @@ Vidējais kurjeru noslogojums samazinās, pieaugot kurjeru skaitam, jo piegādes
 Maiņas ilguma palielināšana nodrošina papildu elastību maršrutu plānošanā, taču pie nemainīga pasūtījumu apjoma var novest pie zemāka relatīvā noslogojuma. Tas norāda uz nepieciešamību pielāgot sistēmas konfigurāciju atbilstoši faktiskajam pieprasījumam.
 
 # Secinājumi
+Darba gaitā tika izstrādāta un novērtēta piegādes maršrutu optimizācijas sistēma, kuras mērķis ir uzlabot loģistikas procesu efektivitāti un piegādes kvalitāti. Izveidotais risinājums nodrošina pasūtījumu apstrādi, adrešu ģeokodēšanu, maršrutu optimizāciju un rezultātu vizuālu attēlošanu, izmantojot mūsdienīgu tehnoloģiju steku un modulāru sistēmas arhitektūru.
+
+Izstrādātais algoritms korekti apstrādā ievaddatus un spēj ģenerēt optimālu maršrutu apmeklēšanas secību dažādos sistēmas noslodzes scenārijos. Eksperimentālie rezultāti parāda, ka algoritma veiktspēja ir pietiekama praktiskai izmantošanai, jo maršrutu plānošana tiek veikta īsā laikā arī pie lielāka kurjeru skaita un palielinātas sistēmas sarežģītības. Tas apliecina risinājuma mērogojamību un stabilitāti.
+
+Analizējot kurjeru noslogojumu, tika konstatēts, ka sistēma efektīvi sadala piegādes starp izpildītājiem, samazinot pārslodzes risku un uzlabojot resursu izmantošanas līdzsvaru. Palielinoties pieejamo resursu skaitam, samazinās individuālais noslogojums, savukārt pieaugot apkalpošanas sarežģītībai, sistēma adekvāti reaģē, saglabājot loģisku un prognozējamu uzvedību.
+
+Kopumā var secināt, ka izstrādātā sistēma atbilst izvirzītajām funkcionālajām un nefunkcionālajām prasībām, kā arī ir piemērota izmantošanai reālās loģistikas un piegādes sistēmās. Risinājums nodrošina stabilu pamatu turpmākai attīstībai, piemēram, algoritma uzlabošanai, papildu ierobežojumu ieviešanai vai integrācijai ar ārējām informācijas sistēmām, tādējādi palielinot tā praktisko lietderību nākotnē.
