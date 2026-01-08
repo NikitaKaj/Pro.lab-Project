@@ -169,3 +169,10 @@ Vidējais kurjeru noslogojums samazinās, pieaugot kurjeru skaitam, jo piegādes
 Maiņas ilguma palielināšana nodrošina papildu elastību maršrutu plānošanā, taču pie nemainīga pasūtījumu apjoma var novest pie zemāka relatīvā noslogojuma. Tas norāda uz nepieciešamību pielāgot sistēmas konfigurāciju atbilstoši faktiskajam pieprasījumam.
 
 # Secinājumi
+Darba gaitā tika izstrādāta un novērtēta piegādes maršrutu optimizācijas sistēma, kuras mērķis ir uzlabot loģistikas procesu efektivitāti un piegādes kvalitāti. Izveidotais risinājums nodrošina pasūtījumu apstrādi, adrešu ģeokodēšanu, maršrutu optimizāciju un rezultātu vizuālu attēlošanu, izmantojot mūsdienīgu tehnoloģiju steku un modulāru sistēmas arhitektūru.
+
+Izstrādātais algoritms korekti apstrādā ievaddatus un spēj ģenerēt optimālu maršrutu apmeklēšanas secību dažādos sistēmas noslodzes scenārijos. Eksperimentālie rezultāti parāda, ka algoritma veiktspēja ir pietiekama praktiskai izmantošanai, jo maršrutu plānošana tiek veikta īsā laikā arī pie lielāka kurjeru skaita un palielinātas sistēmas sarežģītības. Tas apliecina risinājuma mērogojamību un stabilitāti.
+
+Analizējot kurjeru noslogojumu, tika konstatēts, ka sistēma efektīvi sadala piegādes starp izpildītājiem, samazinot pārslodzes risku un uzlabojot resursu izmantošanas līdzsvaru. Palielinoties pieejamo resursu skaitam, samazinās individuālais noslogojums, savukārt pieaugot apkalpošanas sarežģītībai, sistēma adekvāti reaģē, saglabājot loģisku un prognozējamu uzvedību.
+
+Kopumā var secināt, ka izstrādātā sistēma atbilst izvirzītajām funkcionālajām un nefunkcionālajām prasībām, kā arī ir piemērota izmantošanai reālās loģistikas un piegādes sistēmās. Risinājums nodrošina stabilu pamatu turpmākai attīstībai, piemēram, algoritma uzlabošanai, papildu ierobežojumu ieviešanai vai integrācijai ar ārējām informācijas sistēmām, tādējādi palielinot tā praktisko lietderību nākotnē.
