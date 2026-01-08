@@ -52,7 +52,7 @@ Route4Me|Maršruta optimizācijas platforma, kas paredzēta uzņēmumiem un priv
 #### 4. API endpoints jādokumentē ar Swagger/OpenAPI.
 
 ## Algoritms
-BEGIN PROGRAM
+    BEGIN PROGRAM
     Inicializēt servisi (Mapbox, Datubāze, Optimizācija)
 
     Iegūt kurjera pasūtījumus no datubāzes
@@ -84,7 +84,7 @@ BEGIN PROGRAM
         ELSE IF algorithm == WithAlternatives THEN
             Soli pa solim izvēlēties labākos maršrutus
         END IF
-END PROGRAM
+    END PROGRAM
 
 ## Konceptu modelis
 ![Link Error](https://i.ibb.co/rGXDfm6q/image.png)
