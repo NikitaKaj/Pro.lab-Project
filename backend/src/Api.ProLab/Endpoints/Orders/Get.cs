@@ -25,7 +25,7 @@ public class GetOrderData : EndpointBaseAsync
         try
         {
             var orders = await ctx.Orders.ToListAsync(cancellationToken);
-            var response = orders.Select(o => new GetOrderResponse()
+            var response = orders.OrderByDescending(o => o.CreatedAt).Select(o => new GetOrderResponse()
             {
                 OrderId = o.Id,
                 Customer = o.CustomerName,
